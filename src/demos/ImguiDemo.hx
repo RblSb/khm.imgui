@@ -3,6 +3,7 @@ package demos;
 import kha.graphics2.Graphics;
 import kha.Canvas;
 import kha.Assets;
+import kha.System;
 import kha.input.Mouse;
 import kha.input.KeyCode;
 import khm.imgui.Imgui;
@@ -51,7 +52,8 @@ class ImguiDemo extends Screen {
 			onMouseUp(p2);
 		}
 		if (ui.onPointerUp(p)) {
-			// renderGUI(ui.g);
+			// fullscreen / pointer lock workaround
+			if (ui.redrawOnEvents) renderGUI(ui.g);
 			return;
 		}
 	}
@@ -67,13 +69,13 @@ class ImguiDemo extends Screen {
 		else if (key == Tab || key == Down) ui.focusNextItem();
 		else if (key == Return || key == Space) {
 			ui.clickFocusedItem();
-			// renderGUI(ui.g);
+			if (ui.redrawOnEvents) renderGUI(ui.g);
 		}
 
-		if (key == 189 || key == KeyCode.HyphenMinus) {
+		if (key == 189 || key == HyphenMinus) {
 			if (scale > 1) setScale(scale - 1);
 
-		} else if (key == 187 || key == KeyCode.Equals) {
+		} else if (key == 187 || key == Equals) {
 			if (scale < 9) setScale(scale + 1);
 		}
 	}
@@ -114,8 +116,8 @@ class ImguiDemo extends Screen {
 
 	function renderGUI(g:Graphics):Void {
 		ui.begin(g);
-		if (ui.button(100, 40, "Hide")) Mouse.get().hideSystemCursor();
-		if (ui.button(200, 40, "Show")) Mouse.get().showSystemCursor();
+		if (ui.button(100, 40, "Hide")) System.requestFullscreen();
+		if (ui.button(200, 40, "Show")) System.exitFullscreen();
 		if (ui.button(100, 100, "Test")) clickNum--;
 		ui.setButtonSize(80, 20);
 		if (ui.button(200, 100, '$clickNum')) clickNum++;
@@ -128,12 +130,13 @@ class ImguiDemo extends Screen {
 		for (i in 0...3) {
 			if (ui.checkbox(300, 100 + i * 30, i == radioItem, 'Item $i')) radioItem = i;
 		}
+		final fontH = Math.ceil(g.font.height(g.fontSize));
 
 		if (ui.panel(panel)) {
 			final x = panel.mainX;
 			var y = panel.mainY;
 			ui.inputLine(x, y, input2);
-			y += Math.ceil(g.font.height(g.fontSize)) + panel.offset;
+			y += fontH + panel.offset;
 			final w = 60;
 			final h = 30;
 			ui.setButtonSize(w - panel.offset, h - panel.offset);
@@ -148,6 +151,12 @@ class ImguiDemo extends Screen {
 		}
 
 		ui.setButtonSize(70, 40);
+		if (ui.button(Screen.w - 70, 40, "-"))
+			if (scale > 1) setScale(scale - 1);
+		if (ui.button(Screen.w - 70, 40 * 2, "+"))
+			if (scale < 9) setScale(scale + 1);
+		ui.debug = ui.checkbox(0, Screen.h - fontH, ui.debug, 'debug');
+		ui.redrawOnEvents = ui.checkbox(100, Screen.h - fontH, ui.redrawOnEvents, 'redrawOnEvents');
 		ui.end();
 	}
 

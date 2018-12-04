@@ -6,10 +6,6 @@ import khm.imgui.widgets.Input;
 import khm.imgui.widgets.Panel;
 import khm.imgui.widgets.Select in Sel;
 
-typedef IRect = {
-	x:Int, y:Int, w:Int, h:Int
-}
-
 typedef InputState = khm.imgui.widgets.Input.InputState;
 typedef PanelState = khm.imgui.widgets.Panel.PanelState;
 typedef SelectState = khm.imgui.widgets.Select.SelectState;
@@ -22,7 +18,7 @@ class Widgets {
 	public static var focusColor = 0x802082EA;
 	public static var textColor = 0xFFFFFFFF;
 
-	public static inline function setColors(ui:Imgui, bg:Int, hover:Int, active:Int, focus:Int, text:Int):Void {
+	public static function setColors(ui:Imgui, bg:Int, hover:Int, active:Int, focus:Int, text:Int):Void {
 		bgColor = bg;
 		hoverColor = hover;
 		activeColor = active;
@@ -188,6 +184,7 @@ class Widgets {
 	}
 
 	static final scissors:Array<WidgetRect> = [];
+	static final origScissors:Array<WidgetRect> = [];
 
 	// scissor with stack, overlapping and matrix transformation
 	static function scissor(ui:Imgui, x:Int, y:Int, w:Int, h:Int):Void {
@@ -195,8 +192,11 @@ class Widgets {
 		final pos = g.transformation.multvec({x: x, y: y});
 		final size = g.transformation.multvec({x: w, y: h});
 		for (s in scissors) {
-			if (pos.x < s.x) pos.x = s.x;
-			if (pos.y < s.y) pos.y = s.y;
+			final difX = s.x - pos.x;
+			final difY = s.y - pos.y;
+			if (difX > 0) {pos.x += difX; size.x -= difX;}
+			if (difY > 0) {pos.y += difY; size.y -= difY;}
+
 			final difX = size.x + pos.x - s.w - s.x;
 			final difY = size.y + pos.y - s.h - s.y;
 			if (difX > 0) size.x -= difX;
@@ -204,11 +204,9 @@ class Widgets {
 		}
 		if (size.x < 0) size.x = 0;
 		if (size.y < 0) size.y = 0;
+		ui.scissor(x, y, w, h);
+		origScissors.push(new WidgetRect(0, x, y, w, h));
 		g.scissor(
-			Std.int(pos.x), Std.int(pos.y),
-			Std.int(size.x), Std.int(size.y)
-		);
-		ui.scissor(
 			Std.int(pos.x), Std.int(pos.y),
 			Std.int(size.x), Std.int(size.y)
 		);
@@ -218,12 +216,14 @@ class Widgets {
 		));
 	}
 
-	static inline function disableScissor(ui:Imgui):Void {
+	static function disableScissor(ui:Imgui):Void {
 		final g = ui.g;
 		scissors.pop();
+		origScissors.pop();
 		if (scissors.length > 0) {
 			final s = scissors[scissors.length - 1];
 			g.scissor(s.x, s.y, s.w, s.h);
+			final s = origScissors[scissors.length - 1];
 			ui.scissor(s.x, s.y, s.w, s.h);
 		} else {
 			g.disableScissor();

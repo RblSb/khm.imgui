@@ -163,14 +163,14 @@ ui = new Imgui({autoNotifyInput: false, redrawOnEvents: true});
 ...
 override function onMouseUp(p:Pointer):Void {
 	if (ui.onPointerUp(p)) {
-		onRender(ui.g);
+		if (ui.redrawOnEvents) onRender(ui.g);
 		return;
 	}
 }
 ```
 For key listeners `redrawOnEvents: true` don't needed, but render call is required.
 
-Unnecessary redrawing is not the best solution, but another is difficult to achieve. For optimization, I recommend to put the imgui rendering in a separate function and call it like `renderGUI(ui.g)`, and most importantly, create an imgui instance with `redrawOnEvents: true` only for the menu/settings screen with fullscreen / pointer lock buttons, not for everything.
+Unnecessary redrawing is not the best solution, but another is difficult to achieve. For optimization, I recommend to put the imgui rendering in a separate function and call it like `renderGUI(ui.g)`, and most importantly, create an imgui instance with `redrawOnEvents: true` only for the menu/settings screen with fullscreen / pointer lock buttons, not for everything. Or, if you do not want to recreate the imgui instance, set the `ui.redrawOnEvents = true/false` at the right moment.
 
 ### Plans
 * Cache test, more examples, api stabilization

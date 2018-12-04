@@ -139,6 +139,7 @@ class Panel {
 		else if (panel.camY < -(panel.mainH - panel.viewH)) {
 			panel.camY = -(panel.mainH - panel.viewH);
 		}
+		if (panel.isOpen) Widgets.disableScissor(ui);
 		drawScrollbar(ui, panel);
 	}
 
@@ -152,7 +153,6 @@ class Panel {
 
 	static function drawScrollbar(ui:Imgui, panel:PanelState):Void {
 		final g = ui.g;
-		if (panel.isOpen) Widgets.disableScissor(ui);
 		final mainH = panel.mainH;
 		final viewH = panel.viewH;
 		if (mainH > viewH) {

@@ -11,6 +11,7 @@ class ImguiSets {
 
 	public var autoNotifyInput = true;
 	public var redrawOnEvents = false;
+	public var debug = false;
 
 }
 
@@ -37,6 +38,10 @@ class Imgui {
 	public var textToCopy = "";
 	public var isCutText = false;
 	public var isCopyText = false;
+
+	public var autoNotifyInput(default, null):Bool;
+	public var redrawOnEvents:Bool;
+	public var debug:Bool;
 	final pointersDown:Array<Bool> = [for (i in 0...PNUM) false];
 	final pointersUp:Array<Bool> = [for (i in 0...PNUM) false];
 	final blockedKeys:Map<KeyCode, Bool> = [];
@@ -48,8 +53,6 @@ class Imgui {
 	var focusItemId = 0;
 	var id = 0;
 	var blockKeyPress = false;
-	var autoNotifyInput:Bool;
-	var redrawOnEvents:Bool;
 
 	/**
 		Creates new imgui instance.
@@ -58,6 +61,7 @@ class Imgui {
 	public function new(sets:ImguiSets):Void {
 		this.autoNotifyInput = sets.autoNotifyInput;
 		this.redrawOnEvents = sets.redrawOnEvents;
+		this.debug = sets.debug;
 		if (autoNotifyInput) {
 			if (Mouse.get() != null) {
 				Mouse.get().notify(onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
@@ -331,6 +335,11 @@ class Imgui {
 		isCopyText = false;
 		lastFrame = frame;
 		frame = [];
+		if (!debug) return;
+		for (rect in lastFrame) {
+			g.color = 0x88FF0000;
+			g.drawRect(rect.x + 0.5, rect.y + 0.5, rect.w - 1, rect.h - 1);
+		}
 	}
 
 	/**
@@ -350,12 +359,17 @@ class Imgui {
 	public function addWidget(rect:WidgetRect):Void {
 		if (scissorRect != null) {
 			final s = scissorRect;
-			if (rect.x < s.x) rect.x = s.x;
-			if (rect.y < s.y) rect.y = s.y;
+			final difX = s.x - rect.x;
+			final difY = s.y - rect.y;
+			if (difX > 0) {rect.x += difX; rect.w -= difX;}
+			if (difY > 0) {rect.y += difY; rect.h -= difY;}
+
 			final difX = rect.w + rect.x - s.w - s.x;
 			final difY = rect.h + rect.y - s.h - s.y;
 			if (difX > 0) rect.w -= difX;
 			if (difY > 0) rect.h -= difY;
+			if (rect.w < 0) rect.w = 0;
+			if (rect.h < 0) rect.h = 0;
 		}
 		frame.push(rect);
 	}
@@ -511,10 +525,16 @@ class Imgui {
 	/** Set widgets rect restriction. Useful for widgets with scrolling. **/
 	public function scissor(x:Int, y:Int, w:Int, h:Int):Void {
 		scissorRect = new WidgetRect(0, x, y, w, h);
+		if (!debug) return;
+		final rect = scissorRect;
+		final color = g.color;
+		g.color = 0x880000FF;
+		g.drawRect(rect.x - 0.5, rect.y - 0.5, rect.w + 1, rect.h + 1);
+		g.color = color;
 	}
 
 	/** Removes widgets rect restriction. **/
-	public function disableScissor():Void {
+	public inline function disableScissor():Void {
 		scissorRect = null;
 	}
 
