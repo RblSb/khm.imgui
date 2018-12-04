@@ -2,3 +2,6 @@
 /Krom
 /tests/build
 /tests/report
+
+build/*
+!build/html5

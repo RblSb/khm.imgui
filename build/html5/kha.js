@@ -541,7 +541,7 @@ demos_ImguiDemo.__super__ = khm_Screen;
 demos_ImguiDemo.prototype = $extend(khm_Screen.prototype,{
 	ui: null
 	,init: function() {
-		this.ui = new khm_imgui_Imgui(new khm_imgui_ImguiSets(false,null));
+		this.ui = new khm_imgui_Imgui(new khm_imgui_ImguiSets(false,null,null));
 	}
 	,pOffX: null
 	,secondPointer: function(p) {
@@ -575,6 +575,9 @@ demos_ImguiDemo.prototype = $extend(khm_Screen.prototype,{
 			this.onMouseUp(p2);
 		}
 		if(this.ui.onPointerUp(p)) {
+			if(this.ui.redrawOnEvents) {
+				this.renderGUI(this.ui.g);
+			}
 			return;
 		}
 	}
@@ -597,6 +600,9 @@ demos_ImguiDemo.prototype = $extend(khm_Screen.prototype,{
 			var _this = this.ui;
 			if(_this.focusId != 0) {
 				_this.activeIds[0] = _this.focusId;
+			}
+			if(this.ui.redrawOnEvents) {
+				this.renderGUI(this.ui.g);
 			}
 		}
 		if(key == 189 || key == 173) {
@@ -645,10 +651,10 @@ demos_ImguiDemo.prototype = $extend(khm_Screen.prototype,{
 	,renderGUI: function(g) {
 		this.ui.begin(g);
 		if(khm_imgui_Widgets.button(this.ui,100,40,"Hide")) {
-			kha_input_Mouse.get().hideSystemCursor();
+			kha_System.requestFullscreen();
 		}
 		if(khm_imgui_Widgets.button(this.ui,200,40,"Show")) {
-			kha_input_Mouse.get().showSystemCursor();
+			kha_System.exitFullscreen();
 		}
 		if(khm_imgui_Widgets.button(this.ui,100,100,"Test")) {
 			this.clickNum--;
@@ -672,11 +678,12 @@ demos_ImguiDemo.prototype = $extend(khm_Screen.prototype,{
 		if(khm_imgui_Widgets.checkbox(this.ui,300,160,2 == this.radioItem,"Item " + 2)) {
 			this.radioItem = 2;
 		}
+		var fontH = Math.ceil(g.get_font().height(g.get_fontSize()));
 		if(khm_imgui_widgets_Panel.panel(this.ui,this.panel)) {
 			var x = this.panel.mainX;
 			var y = this.panel.mainY;
 			khm_imgui_widgets_Input.inputLine(this.ui,x,y,this.input2);
-			y += Math.ceil(g.get_font().height(g.get_fontSize())) + this.panel.offset;
+			y += fontH + this.panel.offset;
 			var w = 60;
 			var h = 30;
 			var ui1 = this.ui;
@@ -726,6 +733,18 @@ demos_ImguiDemo.prototype = $extend(khm_Screen.prototype,{
 		var ui2 = this.ui;
 		khm_imgui_Widgets.buttonW = 70;
 		khm_imgui_Widgets.buttonH = 40;
+		if(khm_imgui_Widgets.button(this.ui,khm_Screen.w - 70,40,"-")) {
+			if(this.scale > 1) {
+				this.setScale(this.scale - 1);
+			}
+		}
+		if(khm_imgui_Widgets.button(this.ui,khm_Screen.w - 70,80,"+")) {
+			if(this.scale < 9) {
+				this.setScale(this.scale + 1);
+			}
+		}
+		this.ui.debug = khm_imgui_Widgets.checkbox(this.ui,0,khm_Screen.h - fontH,this.ui.debug,"debug");
+		this.ui.redrawOnEvents = khm_imgui_Widgets.checkbox(this.ui,100,khm_Screen.h - fontH,this.ui.redrawOnEvents,"redrawOnEvents");
 		this.ui.end();
 	}
 	,__class__: demos_ImguiDemo
@@ -3612,6 +3631,12 @@ kha_System.windowHeight = function($window) {
 	}
 	return kha_Window.get_all()[$window].get_height();
 };
+kha_System.requestFullscreen = function() {
+	kha_Window.get(0).set_mode(1);
+};
+kha_System.exitFullscreen = function() {
+	kha_Window.get(0).set_mode(0);
+};
 var kha_GamepadStates = function() {
 	this.axes = [];
 	this.buttons = [];
@@ -4637,6 +4662,44 @@ kha_Window.prototype = {
 			return this.defaultHeight;
 		} else {
 			return this.canvas.height;
+		}
+	}
+	,set_mode: function(mode) {
+		if(mode == 1 || mode == 2) {
+			if(!this.isFullscreen()) {
+				this.requestFullscreen();
+			}
+		} else if(this.isFullscreen()) {
+			this.exitFullscreen();
+		}
+		return mode;
+	}
+	,isFullscreen: function() {
+		return document.fullscreenElement === this.canvas ||
+			document.mozFullScreenElement === this.canvas ||
+			document.webkitFullscreenElement === this.canvas ||
+			document.msFullscreenElement === this.canvas ;
+	}
+	,requestFullscreen: function() {
+		if(this.canvas.requestFullscreen) {
+			this.canvas.requestFullscreen();
+		} else if(this.canvas.msRequestFullscreen) {
+			this.canvas.msRequestFullscreen();
+		} else if(this.canvas.mozRequestFullScreen) {
+			this.canvas.mozRequestFullScreen();
+		} else if(this.canvas.webkitRequestFullscreen) {
+			this.canvas.webkitRequestFullscreen();
+		}
+	}
+	,exitFullscreen: function() {
+		if(document.exitFullscreen) {
+			document.exitFullscreen();
+		} else if(document.msExitFullscreen) {
+			document.msExitFullscreen();
+		} else if(document.mozCancelFullScreen) {
+			document.mozCancelFullScreen();
+		} else if(document.webkitExitFullscreen) {
+			document.webkitExitFullscreen();
 		}
 	}
 	,get_vSynced: function() {
@@ -9273,6 +9336,9 @@ kha_graphics2_Graphics.prototype = {
 	}
 	,fillTriangle: function(x1,y1,x2,y2,x3,y3) {
 	}
+	,get_color: function() {
+		return -16777216;
+	}
 	,set_color: function(color) {
 		return -16777216;
 	}
@@ -12832,10 +12898,6 @@ kha_input_Mouse.prototype = $extend(kha_netsync_Controller.prototype,{
 			}
 		}
 	}
-	,hideSystemCursor: function() {
-	}
-	,showSystemCursor: function() {
-	}
 	,windowDownListeners: null
 	,windowUpListeners: null
 	,windowMoveListeners: null
@@ -12946,13 +13008,7 @@ $hxClasses["kha.input.MouseImpl"] = kha_input_MouseImpl;
 kha_input_MouseImpl.__name__ = true;
 kha_input_MouseImpl.__super__ = kha_input_Mouse;
 kha_input_MouseImpl.prototype = $extend(kha_input_Mouse.prototype,{
-	hideSystemCursor: function() {
-		kha_SystemImpl.khanvas.style.cursor = "none";
-	}
-	,showSystemCursor: function() {
-		kha_SystemImpl.khanvas.style.cursor = "default";
-	}
-	,__class__: kha_input_MouseImpl
+	__class__: kha_input_MouseImpl
 });
 var kha_input_Sensor = function() {
 	this.listeners = [];
@@ -13554,6 +13610,9 @@ kha_js_CanvasGraphics.prototype = $extend(kha_graphics2_Graphics.prototype,{
 		this.canvas.strokeStyle = "rgba(" + ((color & 16711680) >>> 16) + "," + ((color & 65280) >>> 8) + "," + (color & 255) + "," + (color >>> 24) * 0.00392156862745098 + ")";
 		this.canvas.fillStyle = "rgba(" + ((color & 16711680) >>> 16) + "," + ((color & 65280) >>> 8) + "," + (color & 255) + "," + (color >>> 24) * 0.00392156862745098 + ")";
 		return color;
+	}
+	,get_color: function() {
+		return this.myColor;
 	}
 	,drawRect: function(x,y,width,height,strength) {
 		if(strength == null) {
@@ -14700,7 +14759,8 @@ kha_netsync_Session.prototype = {
 	}
 	,__class__: kha_netsync_Session
 };
-var khm_imgui_ImguiSets = function(autoNotifyInput,redrawOnEvents) {
+var khm_imgui_ImguiSets = function(autoNotifyInput,redrawOnEvents,debug) {
+	this.debug = false;
 	this.redrawOnEvents = false;
 	this.autoNotifyInput = true;
 	if(autoNotifyInput != null) {
@@ -14709,12 +14769,16 @@ var khm_imgui_ImguiSets = function(autoNotifyInput,redrawOnEvents) {
 	if(redrawOnEvents != null) {
 		this.redrawOnEvents = redrawOnEvents;
 	}
+	if(debug != null) {
+		this.debug = debug;
+	}
 };
 $hxClasses["khm.imgui.ImguiSets"] = khm_imgui_ImguiSets;
 khm_imgui_ImguiSets.__name__ = true;
 khm_imgui_ImguiSets.prototype = {
 	autoNotifyInput: null
 	,redrawOnEvents: null
+	,debug: null
 	,__class__: khm_imgui_ImguiSets
 };
 var khm_imgui_Imgui = function(sets) {
@@ -14807,6 +14871,7 @@ var khm_imgui_Imgui = function(sets) {
 	this.pointers = _g5;
 	this.autoNotifyInput = sets.autoNotifyInput;
 	this.redrawOnEvents = sets.redrawOnEvents;
+	this.debug = sets.debug;
 	if(this.autoNotifyInput) {
 		if(kha_input_Mouse.get() != null) {
 			kha_input_Mouse.get().notify($bind(this,this.onMouseDown),$bind(this,this.onMouseUp),$bind(this,this.onMouseMove),$bind(this,this.onMouseWheel));
@@ -14833,6 +14898,9 @@ khm_imgui_Imgui.prototype = {
 	,textToCopy: null
 	,isCutText: null
 	,isCopyText: null
+	,autoNotifyInput: null
+	,redrawOnEvents: null
+	,debug: null
 	,pointersDown: null
 	,pointersUp: null
 	,blockedKeys: null
@@ -14843,8 +14911,6 @@ khm_imgui_Imgui.prototype = {
 	,focusItemId: null
 	,id: null
 	,blockKeyPress: null
-	,autoNotifyInput: null
-	,redrawOnEvents: null
 	,onPointerDown: function(p) {
 		if(this.pointers[p.id] != p) {
 			this.pointers[p.id] = p;
@@ -15064,23 +15130,44 @@ khm_imgui_Imgui.prototype = {
 		this.isCopyText = false;
 		this.lastFrame = this.frame;
 		this.frame = [];
+		if(!this.debug) {
+			return;
+		}
+		var _g2 = 0;
+		var _g3 = this.lastFrame;
+		while(_g2 < _g3.length) {
+			var rect = _g3[_g2];
+			++_g2;
+			this.g.set_color(-1996554240);
+			this.g.drawRect(rect[1] + 0.5,rect[2] + 0.5,rect[3] - 1,rect[4] - 1);
+		}
 	}
 	,addWidget: function(rect) {
 		if(this.scissorRect != null) {
 			var s = this.scissorRect;
-			if(rect[1] < s[1]) {
-				rect[1] = s[1];
-			}
-			if(rect[2] < s[2]) {
-				rect[2] = s[2];
-			}
-			var difX = rect[3] + rect[1] - s[3] - s[1];
-			var difY = rect[4] + rect[2] - s[4] - s[2];
+			var difX = s[1] - rect[1];
+			var difY = s[2] - rect[2];
 			if(difX > 0) {
+				rect[1] += difX;
 				rect[3] -= difX;
 			}
 			if(difY > 0) {
+				rect[2] += difY;
 				rect[4] -= difY;
+			}
+			var difX1 = rect[3] + rect[1] - s[3] - s[1];
+			var difY1 = rect[4] + rect[2] - s[4] - s[2];
+			if(difX1 > 0) {
+				rect[3] -= difX1;
+			}
+			if(difY1 > 0) {
+				rect[4] -= difY1;
+			}
+			if(rect[3] < 0) {
+				rect[3] = 0;
+			}
+			if(rect[4] < 0) {
+				rect[4] = 0;
 			}
 		}
 		this.frame.push(rect);
@@ -15230,9 +15317,14 @@ khm_imgui_Imgui.prototype = {
 	,scissor: function(x,y,w,h) {
 		var this1 = [0,x,y,w,h,0];
 		this.scissorRect = this1;
-	}
-	,disableScissor: function() {
-		this.scissorRect = null;
+		if(!this.debug) {
+			return;
+		}
+		var rect = this.scissorRect;
+		var color = this.g.get_color();
+		this.g.set_color(-2013265665);
+		this.g.drawRect(rect[1] - 0.5,rect[2] - 0.5,rect[3] + 1,rect[4] + 1);
+		this.g.set_color(color);
 	}
 	,isWidgetClicked: function(id) {
 		var _g = 0;
@@ -15437,19 +15529,23 @@ khm_imgui_Widgets.scissor = function(ui,x,y,w,h) {
 	while(_g < _g1.length) {
 		var s = _g1[_g];
 		++_g;
-		if(pos_x < s[1]) {
-			pos_x = s[1];
-		}
-		if(pos_y < s[2]) {
-			pos_y = s[2];
-		}
-		var difX = size_x + pos_x - s[3] - s[1];
-		var difY = size_y + pos_y - s[4] - s[2];
+		var difX = s[1] - pos_x;
+		var difY = s[2] - pos_y;
 		if(difX > 0) {
+			pos_x += difX;
 			size_x -= difX;
 		}
 		if(difY > 0) {
+			pos_y += difY;
 			size_y -= difY;
+		}
+		var difX1 = size_x + pos_x - s[3] - s[1];
+		var difY1 = size_y + pos_y - s[4] - s[2];
+		if(difX1 > 0) {
+			size_x -= difX1;
+		}
+		if(difY1 > 0) {
+			size_y -= difY1;
 		}
 	}
 	if(size_x < 0) {
@@ -15458,10 +15554,26 @@ khm_imgui_Widgets.scissor = function(ui,x,y,w,h) {
 	if(size_y < 0) {
 		size_y = 0;
 	}
+	ui.scissor(x,y,w,h);
+	var this1 = [0,x,y,w,h,0];
+	khm_imgui_Widgets.origScissors.push(this1);
 	g.scissor(pos_x | 0,pos_y | 0,size_x | 0,size_y | 0);
-	ui.scissor(pos_x | 0,pos_y | 0,size_x | 0,size_y | 0);
-	var this1 = [0,pos_x | 0,pos_y | 0,size_x | 0,size_y | 0,0];
-	khm_imgui_Widgets.scissors.push(this1);
+	var this2 = [0,pos_x | 0,pos_y | 0,size_x | 0,size_y | 0,0];
+	khm_imgui_Widgets.scissors.push(this2);
+};
+khm_imgui_Widgets.disableScissor = function(ui) {
+	var g = ui.g;
+	khm_imgui_Widgets.scissors.pop();
+	khm_imgui_Widgets.origScissors.pop();
+	if(khm_imgui_Widgets.scissors.length > 0) {
+		var s = khm_imgui_Widgets.scissors[khm_imgui_Widgets.scissors.length - 1];
+		g.scissor(s[1],s[2],s[3],s[4]);
+		var s1 = khm_imgui_Widgets.origScissors[khm_imgui_Widgets.scissors.length - 1];
+		ui.scissor(s1[1],s1[2],s1[3],s1[4]);
+	} else {
+		g.disableScissor();
+		ui.scissorRect = null;
+	}
 };
 var khm_imgui_widgets_Input = function() { };
 $hxClasses["khm.imgui.widgets.Input"] = khm_imgui_widgets_Input;
@@ -15627,16 +15739,7 @@ khm_imgui_widgets_Input.inputLine = function(ui,x,y,input) {
 		g.drawString(input.text,textX,y + offY2);
 	}
 	g.popTransformation();
-	var g1 = ui.g;
-	khm_imgui_Widgets.scissors.pop();
-	if(khm_imgui_Widgets.scissors.length > 0) {
-		var s = khm_imgui_Widgets.scissors[khm_imgui_Widgets.scissors.length - 1];
-		g1.scissor(s[1],s[2],s[3],s[4]);
-		ui.scissor(s[1],s[2],s[3],s[4]);
-	} else {
-		g1.disableScissor();
-		ui.disableScissor();
-	}
+	khm_imgui_Widgets.disableScissor(ui);
 };
 var khm_imgui_widgets_InputState = function(text) {
 	if(text == null) {
@@ -15959,6 +16062,9 @@ khm_imgui_widgets_Panel.endPanel = function(ui,panel) {
 	} else if(panel.camY < -(panel.mainH - panel.viewH)) {
 		panel.camY = -(panel.mainH - panel.viewH);
 	}
+	if(panel.isOpen) {
+		khm_imgui_Widgets.disableScissor(ui);
+	}
 	khm_imgui_widgets_Panel.drawScrollbar(ui,panel);
 };
 khm_imgui_widgets_Panel.hoverInRange = function(ui,panelId,lastId) {
@@ -15976,18 +16082,6 @@ khm_imgui_widgets_Panel.hoverInRange = function(ui,panelId,lastId) {
 };
 khm_imgui_widgets_Panel.drawScrollbar = function(ui,panel) {
 	var g = ui.g;
-	if(panel.isOpen) {
-		var g1 = ui.g;
-		khm_imgui_Widgets.scissors.pop();
-		if(khm_imgui_Widgets.scissors.length > 0) {
-			var s = khm_imgui_Widgets.scissors[khm_imgui_Widgets.scissors.length - 1];
-			g1.scissor(s[1],s[2],s[3],s[4]);
-			ui.scissor(s[1],s[2],s[3],s[4]);
-		} else {
-			g1.disableScissor();
-			ui.disableScissor();
-		}
-	}
 	var mainH = panel.mainH;
 	var viewH = panel.viewH;
 	if(mainH > viewH) {
@@ -16329,6 +16423,7 @@ khm_imgui_Widgets.checkboxH = 20;
 khm_imgui_Widgets.sliderSizeW = 100;
 khm_imgui_Widgets.sliderSizeH = 20;
 khm_imgui_Widgets.scissors = [];
+khm_imgui_Widgets.origScissors = [];
 khm_imgui_widgets_Input.inputLineW = 120;
 khm_imgui_widgets_Input.inputLineOffX = 3;
 khm_imgui_widgets_Input.inputLineOffY = 2;
