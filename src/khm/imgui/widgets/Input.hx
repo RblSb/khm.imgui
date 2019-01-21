@@ -83,7 +83,7 @@ class Input {
 			case Hover, Focus: hoverColor;
 			case Active: activeColor;
 		}
-		g.drawRect(x + 0.5, y + 0.5, w - 0.5, h - 0.5);
+		g.drawRect(x + 0.5, y + 0.5, w - 1, h - 1);
 		Widgets.scissor(ui, x + 1, y, w - 2, h);
 		final cx = input.camera.x;
 		final cy = input.camera.y;

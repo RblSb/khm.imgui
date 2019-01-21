@@ -14,6 +14,8 @@ typedef Pointer = {
 	// button type (for mouse)
 	type:Int,
 	isDown:Bool,
-	// if pointer already used
+	// pointer is touch surface
+	isTouch:Bool,
+	// pointer already used
 	isActive:Bool
 }

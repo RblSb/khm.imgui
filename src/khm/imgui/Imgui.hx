@@ -22,10 +22,12 @@ class Imgui {
 		for (i in 0...PNUM) {
 			id: i, startX: 0, startY: 0,
 			x: 0, y: 0, moveX: 0, moveY: 0,
-			type: 0, isDown: false, isActive: false
+			type: 0, isDown: false,
+			isTouch: false, isActive: false
 		}
 	];
 	public final hoverIds:Array<Int> = [for (i in 0...PNUM) 0];
+	public final lastHoverIds:Array<Int> = [for (i in 0...PNUM) 0];
 	public final activeIds:Array<Int> = [for (i in 0...PNUM) 0];
 	public final widgetGroups:Array<Int> = [for (i in 0...PNUM) 0];
 	public var focusId(default, null) = 0;
@@ -96,7 +98,14 @@ class Imgui {
 		if (pointers[p.id] != p) pointers[p.id] = p;
 		keyboardFocus = false;
 		pointersDown[p.id] = true;
-		if (redrawOnEvents) setActive(p.id, hoverIds[p.id]);
+		if (redrawOnEvents) {
+			if (p.isTouch) {
+				for (rect in lastFrame) {
+					checkWidgetState(rect);
+					if (activeIds[p.id] != 0) break;
+				}
+			} else setActive(p.id, hoverIds[p.id]);
+		}
 		return isPointerBlocked(p.id, p.x, p.y);
 	}
 
@@ -155,6 +164,7 @@ class Imgui {
 		pointers[0].type = button;
 		pointers[0].isDown = true;
 		pointers[0].isActive = true;
+		pointers[0].isTouch = false;
 		return onPointerDown(pointers[0]);
 	}
 
@@ -189,6 +199,7 @@ class Imgui {
 		pointers[id].y = y;
 		pointers[id].isDown = true;
 		pointers[id].isActive = true;
+		pointers[0].isTouch = true;
 		return onPointerDown(pointers[id]);
 	}
 
@@ -202,7 +213,7 @@ class Imgui {
 		return onPointerMove(pointers[id]);
 	}
 
-	inline function onTouchUp(id:Int, x:Int, y:Int):Bool {
+	public function onTouchUp(id:Int, x:Int, y:Int):Bool {
 		if (id >= PNUM - 1) return false;
 		if (!pointers[id].isActive) return false;
 		pointers[id].x = x;
@@ -308,6 +319,7 @@ class Imgui {
 		this.g = g;
 		if (!keyboardFocus) focusId = 0;
 		for (i in 0...hoverIds.length) {
+			lastHoverIds[i] = hoverIds[i];
 			hoverIds[i] = 0;
 			widgetGroups[i] = 0;
 		}
@@ -399,7 +411,7 @@ class Imgui {
 	**/
 	public function isInside(id:Int, x:Int, y:Int, w:Int, h:Int):Null<Pointer> {
 		for (p in pointers) {
-			if (!p.isActive) continue;
+			if (!pointersDown[p.id] && !p.isActive) continue;
 			if (p.x < x || p.y < y ||
 				p.x >= x + w || p.y >= y + h) {
 				continue;
@@ -554,11 +566,14 @@ class Imgui {
 	/** Checks if widget clicked (pointer released with widget be selected and active). **/
 	public function isWidgetClicked(id:Int):Bool {
 		for (p in pointers) {
-			if (
-				activeIds[p.id] == id &&
-				(hoverIds[p.id] == id || isFocused(id)) &&
-				!pointersDown[p.id]
-			) return true;
+			if (activeIds[p.id] != id) continue;
+			if (pointersDown[p.id]) continue;
+			if (!p.isTouch) {
+				if (hoverIds[p.id] != id && !isFocused(id)) continue;
+			} else {
+				if (lastHoverIds[p.id] != id) continue;
+			}
+			return true;
 		}
 		return false;
 	}

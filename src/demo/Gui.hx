@@ -1,4 +1,4 @@
-package demos;
+package demo;
 
 import kha.graphics2.Graphics;
 import kha.Canvas;
@@ -13,7 +13,7 @@ import khm.imgui.Widgets.PanelState;
 import khm.imgui.Widgets.SelectState;
 using khm.imgui.Widgets;
 
-class ImguiDemo extends Screen {
+class Gui extends Screen {
 
 	var ui:Imgui;
 
@@ -27,6 +27,8 @@ class ImguiDemo extends Screen {
 		p2.id = p.id + 1;
 		p2.startX += pOffX;
 		p2.x += pOffX;
+		p2.isActive = p2.isDown;
+		p2.isTouch = true;
 		return p2;
 	}
 

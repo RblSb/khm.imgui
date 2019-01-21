@@ -20,7 +20,7 @@ class Main {
 	}
 
 	static function init():Void {
-		var demo = new demos.ImguiDemo();
+		var demo = new demo.Gui();
 		demo.show();
 		demo.init();
 	}

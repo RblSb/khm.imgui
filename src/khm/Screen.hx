@@ -26,7 +26,9 @@ typedef Pointer = {
 	// button type (for mouse)
 	type:Int,
 	isDown:Bool,
-	// if pointer already used
+	// pointer is touch surface
+	isTouch:Bool,
+	// pointer already used
 	isActive:Bool
 }
 
@@ -46,14 +48,14 @@ class Screen {
 	public static var samplesPerPixel(default, null) = 1;
 	public static var defaultScale(default, null) = 1.0;
 	public static var frame:Canvas;
-	static var fps = new FPS();
+	static final fps = new FPS();
 	static var taskId:Int;
 	static var isInited = false;
 
 	public var scale(default, null) = 1.0;
-	public var keys:Map<KeyCode, Bool> = new Map();
-	public var pointers:Map<Int, Pointer> = [
-		for (i in 0...10) i => {id: i, startX: 0, startY: 0, x: 0, y: 0, moveX: 0, moveY: 0, type: 0, isDown: false, isActive: false}
+	public final keys:Map<KeyCode, Bool> = new Map();
+	public final pointers:Map<Int, Pointer> = [
+		for (i in 0...10) i => {id: i, startX: 0, startY: 0, x: 0, y: 0, moveX: 0, moveY: 0, type: 0, isDown: false, isTouch: false, isActive: false}
 	];
 
 	public function new() {}
@@ -129,17 +131,17 @@ class Screen {
 	}
 
 	inline function _onRender(framebuffers:Array<Framebuffer>):Void {
-		var framebuffer = framebuffers[0];
+		final framebuffer = framebuffers[0];
 
 		frame = framebuffer;
-		var g = frame.g2;
+		final g = frame.g2;
 		g.transformation = FastMatrix3.scale(scale, scale);
 		onRender(frame);
 
 		#if debug
-		var font = frame.g2.font;
+		final font = frame.g2.font;
 		if (font != null) {
-			var g = framebuffer.g2;
+			final g = framebuffer.g2;
 			g.begin(false);
 			drawFPS(g, font);
 			g.end();
@@ -153,11 +155,11 @@ class Screen {
 		g.color = 0xFFFFFFFF;
 		g.font = font;
 		g.fontSize = 24;
-		var w = System.windowWidth();
-		var h = System.windowHeight();
-		var txt = '${fps.fps} | ${w}x${h} ${scale}x';
-		var x = w - g.font.width(g.fontSize, txt);
-		var y = h - g.font.height(g.fontSize);
+		final w = System.windowWidth();
+		final h = System.windowHeight();
+		final txt = '${fps.fps} | ${w}x${h} ${scale}x';
+		final x = w - g.font.width(g.fontSize, txt);
+		final y = h - g.font.height(g.fontSize);
 		g.drawString(txt, x, y);
 	}
 
@@ -181,6 +183,7 @@ class Screen {
 		pointers[0].type = button;
 		pointers[0].isDown = true;
 		pointers[0].isActive = true;
+		pointers[0].isTouch = false;
 		onMouseDown(pointers[0]);
 	}
 
@@ -216,6 +219,7 @@ class Screen {
 		pointers[id].y = y;
 		pointers[id].isDown = true;
 		pointers[id].isActive = true;
+		pointers[id].isTouch = true;
 		onMouseDown(pointers[id]);
 	}
 
@@ -227,6 +231,8 @@ class Screen {
 		pointers[id].moveY = y - pointers[id].y;
 		pointers[id].x = x;
 		pointers[id].y = y;
+		pointers[id].isDown = true;
+		pointers[id].isActive = true;
 		onMouseMove(pointers[id]);
 	}
 
@@ -238,6 +244,7 @@ class Screen {
 		pointers[id].x = x;
 		pointers[id].y = y;
 		pointers[id].isDown = false;
+		pointers[id].isActive = false;
 		onMouseUp(pointers[id]);
 	}
 
@@ -246,7 +253,10 @@ class Screen {
 	**/
 	public function setScale(scale:Float):Void {
 		this.scale = scale;
+		w = Std.int(System.windowWidth() / scale);
+		h = Std.int(System.windowHeight() / scale);
 		onRescale(scale);
+		onResize();
 	}
 
 	// functions for override
