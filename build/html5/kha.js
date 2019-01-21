@@ -9,31 +9,7 @@ function $extend(from, fields) {
 	for (var name in fields) proto[name] = fields[name];
 	if( fields.toString !== Object.prototype.toString ) proto.toString = fields.toString;
 	return proto;
-}var EReg = function(r,opt) {
-	this.r = new RegExp(r,opt.split("u").join(""));
-};
-$hxClasses["EReg"] = EReg;
-EReg.__name__ = true;
-EReg.prototype = {
-	r: null
-	,match: function(s) {
-		if(this.r.global) {
-			this.r.lastIndex = 0;
-		}
-		this.r.m = this.r.exec(s);
-		this.r.s = s;
-		return this.r.m != null;
-	}
-	,matched: function(n) {
-		if(this.r.m != null && n >= 0 && n < this.r.m.length) {
-			return this.r.m[n];
-		} else {
-			throw new js__$Boot_HaxeError("EReg::matched");
-		}
-	}
-	,__class__: EReg
-};
-var HxOverrides = function() { };
+}var HxOverrides = function() { };
 $hxClasses["HxOverrides"] = HxOverrides;
 HxOverrides.__name__ = true;
 HxOverrides.strDate = function(s) {
@@ -102,9 +78,9 @@ Main.main = function() {
 	});
 };
 Main.init = function() {
-	var demo = new demos_ImguiDemo();
-	demo.show();
-	demo.init();
+	var demo1 = new demo_Gui();
+	demo1.show();
+	demo1.init();
 };
 Main.setFullWindowCanvas = function() {
 	window.document.documentElement.style.padding = "0";
@@ -272,16 +248,16 @@ khm__$Screen_FPS.prototype = {
 };
 var khm_Screen = function() {
 	var _g = new haxe_ds_IntMap();
-	_g.h[0] = { id : 0, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false};
-	_g.h[1] = { id : 1, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false};
-	_g.h[2] = { id : 2, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false};
-	_g.h[3] = { id : 3, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false};
-	_g.h[4] = { id : 4, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false};
-	_g.h[5] = { id : 5, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false};
-	_g.h[6] = { id : 6, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false};
-	_g.h[7] = { id : 7, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false};
-	_g.h[8] = { id : 8, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false};
-	_g.h[9] = { id : 9, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false};
+	_g.h[0] = { id : 0, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false};
+	_g.h[1] = { id : 1, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false};
+	_g.h[2] = { id : 2, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false};
+	_g.h[3] = { id : 3, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false};
+	_g.h[4] = { id : 4, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false};
+	_g.h[5] = { id : 5, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false};
+	_g.h[6] = { id : 6, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false};
+	_g.h[7] = { id : 7, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false};
+	_g.h[8] = { id : 8, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false};
+	_g.h[9] = { id : 9, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false};
 	this.pointers = _g;
 	this.keys = new haxe_ds_IntMap();
 	this.scale = 1.0;
@@ -429,6 +405,7 @@ khm_Screen.prototype = {
 		this.pointers.h[0].type = button;
 		this.pointers.h[0].isDown = true;
 		this.pointers.h[0].isActive = true;
+		this.pointers.h[0].isTouch = false;
 		this.onMouseDown(this.pointers.h[0]);
 	}
 	,_onMouseMove: function(x,y,mx,my) {
@@ -465,6 +442,7 @@ khm_Screen.prototype = {
 		this.pointers.h[id].y = y;
 		this.pointers.h[id].isDown = true;
 		this.pointers.h[id].isActive = true;
+		this.pointers.h[id].isTouch = true;
 		this.onMouseDown(this.pointers.h[id]);
 	}
 	,_onTouchMove: function(id,x,y) {
@@ -477,6 +455,8 @@ khm_Screen.prototype = {
 		this.pointers.h[id].moveY = y - this.pointers.h[id].y;
 		this.pointers.h[id].x = x;
 		this.pointers.h[id].y = y;
+		this.pointers.h[id].isDown = true;
+		this.pointers.h[id].isActive = true;
 		this.onMouseMove(this.pointers.h[id]);
 	}
 	,_onTouchUp: function(id,x,y) {
@@ -491,11 +471,15 @@ khm_Screen.prototype = {
 		this.pointers.h[id].x = x;
 		this.pointers.h[id].y = y;
 		this.pointers.h[id].isDown = false;
+		this.pointers.h[id].isActive = false;
 		this.onMouseUp(this.pointers.h[id]);
 	}
 	,setScale: function(scale) {
 		this.scale = scale;
+		khm_Screen.w = kha_System.windowWidth() / scale | 0;
+		khm_Screen.h = kha_System.windowHeight() / scale | 0;
 		this.onRescale(scale);
+		this.onResize();
 	}
 	,onRescale: function(scale) {
 	}
@@ -523,7 +507,7 @@ khm_Screen.prototype = {
 	}
 	,__class__: khm_Screen
 };
-var demos_ImguiDemo = function() {
+var demo_Gui = function() {
 	this.radioItem = 0;
 	this.select = new khm_imgui_widgets_SelectState(["Select Name","Kinc","Kool","Kute"]);
 	this.panel = new khm_imgui_widgets_PanelState("Panel",450,20,150,200);
@@ -535,10 +519,10 @@ var demos_ImguiDemo = function() {
 	this.pOffX = 500;
 	khm_Screen.call(this);
 };
-$hxClasses["demos.ImguiDemo"] = demos_ImguiDemo;
-demos_ImguiDemo.__name__ = true;
-demos_ImguiDemo.__super__ = khm_Screen;
-demos_ImguiDemo.prototype = $extend(khm_Screen.prototype,{
+$hxClasses["demo.Gui"] = demo_Gui;
+demo_Gui.__name__ = true;
+demo_Gui.__super__ = khm_Screen;
+demo_Gui.prototype = $extend(khm_Screen.prototype,{
 	ui: null
 	,init: function() {
 		this.ui = new khm_imgui_Imgui(new khm_imgui_ImguiSets(false,null,null));
@@ -549,6 +533,8 @@ demos_ImguiDemo.prototype = $extend(khm_Screen.prototype,{
 		p2.id = p.id + 1;
 		p2.startX += this.pOffX;
 		p2.x += this.pOffX;
+		p2.isActive = p2.isDown;
+		p2.isTouch = true;
 		return p2;
 	}
 	,onMouseDown: function(p) {
@@ -747,7 +733,7 @@ demos_ImguiDemo.prototype = $extend(khm_Screen.prototype,{
 		this.ui.redrawOnEvents = khm_imgui_Widgets.checkbox(this.ui,100,khm_Screen.h - fontH,this.ui.redrawOnEvents,"redrawOnEvents");
 		this.ui.end();
 	}
-	,__class__: demos_ImguiDemo
+	,__class__: demo_Gui
 });
 var haxe_IMap = function() { };
 $hxClasses["haxe.IMap"] = haxe_IMap;
@@ -1617,18 +1603,6 @@ haxe_io_FPHelper.floatToI32 = function(f) {
 	haxe_io_FPHelper.helper.setFloat32(0,f,true);
 	return haxe_io_FPHelper.helper.getInt32(0,true);
 };
-var haxe_io__$UInt8Array_UInt8Array_$Impl_$ = {};
-$hxClasses["haxe.io._UInt8Array.UInt8Array_Impl_"] = haxe_io__$UInt8Array_UInt8Array_$Impl_$;
-haxe_io__$UInt8Array_UInt8Array_$Impl_$.__name__ = true;
-haxe_io__$UInt8Array_UInt8Array_$Impl_$.fromBytes = function(bytes,bytePos,length) {
-	if(bytePos == null) {
-		bytePos = 0;
-	}
-	if(length == null) {
-		length = bytes.length - bytePos;
-	}
-	return new Uint8Array(bytes.b.bufferValue,bytePos,length);
-};
 var js__$Boot_HaxeError = function(val) {
 	Error.call(this);
 	this.val = val;
@@ -2017,7 +1991,7 @@ kha_Assets.loadEverything = function(callback,filter,uncompressSoundsFilter,fail
 				(Reflect.field(kha_Assets.blobs,blob1))(onLoaded,function(err) {
 					if(failed == null) {
 						var f = haxe_Log.trace;
-						var infos = { fileName : "kha/Assets.hx", lineNumber : 134, className : "kha.Assets", methodName : "loadEverything"};
+						var infos = { fileName : "kha/Assets.hx", lineNumber : 136, className : "kha.Assets", methodName : "loadEverything"};
 					}
 					onLoaded();
 				});
@@ -2038,7 +2012,7 @@ kha_Assets.loadEverything = function(callback,filter,uncompressSoundsFilter,fail
 				(Reflect.field(kha_Assets.images,image1))(onLoaded,function(err1) {
 					if(failed == null) {
 						var f1 = haxe_Log.trace;
-						var infos1 = { fileName : "kha/Assets.hx", lineNumber : 150, className : "kha.Assets", methodName : "loadEverything"};
+						var infos1 = { fileName : "kha/Assets.hx", lineNumber : 152, className : "kha.Assets", methodName : "loadEverything"};
 					}
 					onLoaded();
 				});
@@ -2069,7 +2043,7 @@ kha_Assets.loadEverything = function(callback,filter,uncompressSoundsFilter,fail
 					return function(v) {
 						f2[0](v,infos2[0]);
 					};
-				})([{ fileName : "kha/Assets.hx", lineNumber : 172, className : "kha.Assets", methodName : "loadEverything"}],[haxe_Log.trace]));
+				})([{ fileName : "kha/Assets.hx", lineNumber : 174, className : "kha.Assets", methodName : "loadEverything"}],[haxe_Log.trace]));
 			} else {
 				onLoaded();
 			}
@@ -2087,7 +2061,7 @@ kha_Assets.loadEverything = function(callback,filter,uncompressSoundsFilter,fail
 				(Reflect.field(kha_Assets.fonts,font1))(onLoaded,function(err2) {
 					if(failed == null) {
 						var f3 = haxe_Log.trace;
-						var infos3 = { fileName : "kha/Assets.hx", lineNumber : 185, className : "kha.Assets", methodName : "loadEverything"};
+						var infos3 = { fileName : "kha/Assets.hx", lineNumber : 187, className : "kha.Assets", methodName : "loadEverything"};
 					}
 					onLoaded();
 				});
@@ -2108,7 +2082,7 @@ kha_Assets.loadEverything = function(callback,filter,uncompressSoundsFilter,fail
 				(Reflect.field(kha_Assets.videos,video1))(onLoaded,function(err3) {
 					if(failed == null) {
 						var f4 = haxe_Log.trace;
-						var infos4 = { fileName : "kha/Assets.hx", lineNumber : 200, className : "kha.Assets", methodName : "loadEverything"};
+						var infos4 = { fileName : "kha/Assets.hx", lineNumber : 202, className : "kha.Assets", methodName : "loadEverything"};
 					}
 					onLoaded();
 				});
@@ -2117,107 +2091,6 @@ kha_Assets.loadEverything = function(callback,filter,uncompressSoundsFilter,fail
 			}
 		}
 	}
-};
-kha_Assets.loadImage = function(name,done,failed,pos) {
-	var description = Reflect.field(kha_Assets.images,name + "Description");
-	var tmp;
-	if(failed != null) {
-		tmp = failed;
-	} else {
-		var f = haxe_Log.trace;
-		var infos = pos;
-		tmp = function(v) {
-			f(v,infos);
-		};
-	}
-	kha_LoaderImpl.loadImageFromDescription(description,function(image) {
-		kha_Assets.images[name] = image;
-		done(image);
-	},tmp);
-};
-kha_Assets.loadImageFromPath = function(path,readable,done,failed,pos) {
-	var description = { files : [path], readable : readable};
-	var tmp;
-	if(failed != null) {
-		tmp = failed;
-	} else {
-		var f = haxe_Log.trace;
-		var infos = pos;
-		tmp = function(v) {
-			f(v,infos);
-		};
-	}
-	kha_LoaderImpl.loadImageFromDescription(description,done,tmp);
-};
-kha_Assets.get_imageFormats = function() {
-	return kha_LoaderImpl.getImageFormats();
-};
-kha_Assets.loadBlob = function(name,done,failed,pos) {
-	var description = Reflect.field(kha_Assets.blobs,name + "Description");
-	var tmp;
-	if(failed != null) {
-		tmp = failed;
-	} else {
-		var f = haxe_Log.trace;
-		var infos = pos;
-		tmp = function(v) {
-			f(v,infos);
-		};
-	}
-	kha_LoaderImpl.loadBlobFromDescription(description,function(blob) {
-		kha_Assets.blobs[name] = blob;
-		done(blob);
-	},tmp);
-};
-kha_Assets.loadBlobFromPath = function(path,done,failed,pos) {
-	var description = { files : [path]};
-	var tmp;
-	if(failed != null) {
-		tmp = failed;
-	} else {
-		var f = haxe_Log.trace;
-		var infos = pos;
-		tmp = function(v) {
-			f(v,infos);
-		};
-	}
-	kha_LoaderImpl.loadBlobFromDescription(description,done,tmp);
-};
-kha_Assets.loadSound = function(name,done,failed,pos) {
-	var description = Reflect.field(kha_Assets.sounds,name + "Description");
-	var tmp;
-	if(failed != null) {
-		tmp = failed;
-	} else {
-		var f = haxe_Log.trace;
-		var infos = pos;
-		tmp = function(v) {
-			f(v,infos);
-		};
-	}
-	kha_LoaderImpl.loadSoundFromDescription(description,function(sound) {
-		kha_Assets.sounds[name] = sound;
-		done(sound);
-	},tmp);
-	return;
-};
-kha_Assets.loadSoundFromPath = function(path,done,failed,pos) {
-	var description = { files : [path]};
-	var tmp;
-	if(failed != null) {
-		tmp = failed;
-	} else {
-		var f = haxe_Log.trace;
-		var infos = pos;
-		tmp = function(v) {
-			f(v,infos);
-		};
-	}
-	kha_LoaderImpl.loadSoundFromDescription(description,done,tmp);
-	return;
-};
-kha_Assets.get_soundFormats = function() {
-	return kha_LoaderImpl.getSoundFormats();
 };
 kha_Assets.loadFont = function(name,done,failed,pos) {
 	var description = Reflect.field(kha_Assets.fonts,name + "Description");
@@ -2236,71 +2109,6 @@ kha_Assets.loadFont = function(name,done,failed,pos) {
 		done(font);
 	},tmp);
 	return;
-};
-kha_Assets.loadFontFromPath = function(path,done,failed,pos) {
-	var description = { files : [path]};
-	var tmp;
-	if(failed != null) {
-		tmp = failed;
-	} else {
-		var f = haxe_Log.trace;
-		var infos = pos;
-		tmp = function(v) {
-			f(v,infos);
-		};
-	}
-	kha_LoaderImpl.loadFontFromDescription(description,done,tmp);
-	return;
-};
-kha_Assets.get_fontFormats = function() {
-	return ["ttf"];
-};
-kha_Assets.loadVideo = function(name,done,failed,pos) {
-	var description = Reflect.field(kha_Assets.videos,name + "Description");
-	var tmp;
-	if(failed != null) {
-		tmp = failed;
-	} else {
-		var f = haxe_Log.trace;
-		var infos = pos;
-		tmp = function(v) {
-			f(v,infos);
-		};
-	}
-	kha_LoaderImpl.loadVideoFromDescription(description,function(video) {
-		kha_Assets.videos[name] = video;
-		done(video);
-	},tmp);
-	return;
-};
-kha_Assets.loadVideoFromPath = function(path,done,failed,pos) {
-	var description = { files : [path]};
-	var tmp;
-	if(failed != null) {
-		tmp = failed;
-	} else {
-		var f = haxe_Log.trace;
-		var infos = pos;
-		tmp = function(v) {
-			f(v,infos);
-		};
-	}
-	kha_LoaderImpl.loadVideoFromDescription(description,done,tmp);
-	return;
-};
-kha_Assets.get_videoFormats = function() {
-	return kha_LoaderImpl.getVideoFormats();
-};
-kha_Assets.reporter = function(custom,pos) {
-	if(custom != null) {
-		return custom;
-	} else {
-		var f = haxe_Log.trace;
-		var infos = pos;
-		return function(v) {
-			f(v,infos);
-		};
-	}
 };
 var kha_Canvas = function() { };
 $hxClasses["kha.Canvas"] = kha_Canvas;
@@ -2330,47 +2138,6 @@ kha_Image.create = function(width,height,format,usage) {
 		return new kha_CanvasImage(width,height,format,false);
 	} else {
 		return new kha_WebGLImage(width,height,format,false,0,1);
-	}
-};
-kha_Image.fromImage = function(image,readable) {
-	if(kha_SystemImpl.gl == null) {
-		var img = new kha_CanvasImage(image.width,image.height,0,false);
-		img.image = image;
-		img.createTexture();
-		return img;
-	} else {
-		var img1 = new kha_WebGLImage(image.width,image.height,0,false,0,1);
-		img1.image = image;
-		img1.createTexture();
-		return img1;
-	}
-};
-kha_Image.fromBytes = function(bytes,width,height,format,usage) {
-	if(format == null) {
-		format = 0;
-	}
-	if(usage == null) {
-		usage = 0;
-	}
-	if(kha_SystemImpl.gl != null) {
-		var img = new kha_WebGLImage(width,height,format,false,0,1);
-		img.image = img.bytesToArray(bytes);
-		img.createTexture();
-		return img;
-	}
-	return null;
-};
-kha_Image.fromVideo = function(video) {
-	if(kha_SystemImpl.gl == null) {
-		var img = new kha_CanvasImage(video.element.videoWidth,video.element.videoHeight,0,false);
-		img.video = video.element;
-		img.createTexture();
-		return img;
-	} else {
-		var img1 = new kha_WebGLImage(video.element.videoWidth,video.element.videoHeight,0,false,0,1);
-		img1.video = video.element;
-		img1.createTexture();
-		return img1;
 	}
 };
 kha_Image.get_nonPow2Supported = function() {
@@ -2764,19 +2531,6 @@ kha_KravurImage.prototype = {
 		}
 		return width;
 	}
-	,charactersWidth: function(characters,start,length) {
-		var width = 0;
-		var _g = start;
-		var _g1 = start + length;
-		while(_g < _g1) {
-			var i = _g++;
-			width += this.getCharWidth(characters[i]);
-		}
-		return width;
-	}
-	,getBaselinePosition: function() {
-		return this.baseline;
-	}
 	,__class__: kha_KravurImage
 };
 var kha_Kravur = function(blob) {
@@ -2861,127 +2615,6 @@ kha_Kravur.prototype = {
 var kha_LoaderImpl = function() { };
 $hxClasses["kha.LoaderImpl"] = kha_LoaderImpl;
 kha_LoaderImpl.__name__ = true;
-kha_LoaderImpl.getImageFormats = function() {
-	return ["png","jpg","hdr"];
-};
-kha_LoaderImpl.loadImageFromDescription = function(desc,done,failed) {
-	var readable = Object.prototype.hasOwnProperty.call(desc,"readable") && desc.readable;
-	if(StringTools.endsWith(desc.files[0],".hdr")) {
-		kha_LoaderImpl.loadBlobFromDescription(desc,function(blob) {
-			var hdrImage = kha_internal_HdrFormat.parse(blob.toBytes());
-			var tmp = kha_Image.fromBytes(haxe_io_Bytes.ofData(hdrImage.data.buffer),hdrImage.width,hdrImage.height,2,readable ? 1 : 0);
-			done(tmp);
-		},failed);
-	} else {
-		var img = window.document.createElement("img");
-		img.onerror = function(event) {
-			failed({ url : desc.files[0], error : event});
-		};
-		img.onload = function(event1) {
-			var tmp1 = kha_Image.fromImage(img,readable);
-			done(tmp1);
-		};
-		img.src = desc.files[0];
-		img.crossOrigin = "";
-	}
-};
-kha_LoaderImpl.getSoundFormats = function() {
-	var element = window.document.createElement("audio");
-	var formats = [];
-	if(element.canPlayType("audio/mp4") != "") {
-		formats.push("mp4");
-	}
-	if(element.canPlayType("audio/mp3") != "") {
-		formats.push("mp3");
-	}
-	if(kha_SystemImpl._hasWebAudio || element.canPlayType("audio/ogg") != "") {
-		formats.push("ogg");
-	}
-	return formats;
-};
-kha_LoaderImpl.loadSoundFromDescription = function(desc,done,failed) {
-	if(kha_SystemImpl._hasWebAudio) {
-		var element = window.document.createElement("audio");
-		if(element.canPlayType("audio/mp4") != "") {
-			var _g = 0;
-			var _g1 = desc.files.length;
-			while(_g < _g1) {
-				var i = _g++;
-				var file = desc.files[i];
-				if(StringTools.endsWith(file,".mp4")) {
-					new kha_js_WebAudioSound(file,done,failed);
-					return;
-				}
-			}
-		}
-		if(element.canPlayType("audio/mp3") != "") {
-			var _g2 = 0;
-			var _g11 = desc.files.length;
-			while(_g2 < _g11) {
-				var i1 = _g2++;
-				var file1 = desc.files[i1];
-				if(StringTools.endsWith(file1,".mp3")) {
-					new kha_js_WebAudioSound(file1,done,failed);
-					return;
-				}
-			}
-		}
-		var _g3 = 0;
-		var _g12 = desc.files.length;
-		while(_g3 < _g12) {
-			var i2 = _g3++;
-			var file2 = desc.files[i2];
-			if(StringTools.endsWith(file2,".ogg")) {
-				new kha_js_WebAudioSound(file2,done,failed);
-				return;
-			}
-		}
-	} else if(kha_SystemImpl.mobile) {
-		var element1 = window.document.createElement("audio");
-		if(element1.canPlayType("audio/mp4") != "") {
-			var _g4 = 0;
-			var _g13 = desc.files.length;
-			while(_g4 < _g13) {
-				var i3 = _g4++;
-				var file3 = desc.files[i3];
-				if(StringTools.endsWith(file3,".mp4")) {
-					new kha_js_MobileWebAudioSound(file3,done,failed);
-					return;
-				}
-			}
-		}
-		if(element1.canPlayType("audio/mp3") != "") {
-			var _g5 = 0;
-			var _g14 = desc.files.length;
-			while(_g5 < _g14) {
-				var i4 = _g5++;
-				var file4 = desc.files[i4];
-				if(StringTools.endsWith(file4,".mp3")) {
-					new kha_js_MobileWebAudioSound(file4,done,failed);
-					return;
-				}
-			}
-		}
-		var _g6 = 0;
-		var _g15 = desc.files.length;
-		while(_g6 < _g15) {
-			var i5 = _g6++;
-			var file5 = desc.files[i5];
-			if(StringTools.endsWith(file5,".ogg")) {
-				new kha_js_MobileWebAudioSound(file5,done,failed);
-				return;
-			}
-		}
-	} else {
-		new kha_js_Sound(desc.files,done,failed);
-	}
-};
-kha_LoaderImpl.getVideoFormats = function() {
-	return ["mp4","webm"];
-};
-kha_LoaderImpl.loadVideoFromDescription = function(desc,done,failed) {
-	kha_js_Video.fromFile(desc.files,done);
-};
 kha_LoaderImpl.loadRemote = function(desc,done,failed) {
 	var request = new XMLHttpRequest();
 	request.open("GET",desc.files[0],true);
@@ -3664,20 +3297,6 @@ kha_SystemImpl.initSecondStep = function(callback) {
 	kha_SystemImpl.init2(kha_SystemImpl.options.window.width,kha_SystemImpl.options.window.height);
 	callback(kha_SystemImpl.window);
 };
-kha_SystemImpl.initSensor = function() {
-	if(kha_SystemImpl.ios) {
-		window.ondevicemotion = function(event) {
-			kha_input_Sensor._changed(0,-event.accelerationIncludingGravity.x,-event.accelerationIncludingGravity.y,-event.accelerationIncludingGravity.z);
-		};
-	} else {
-		window.ondevicemotion = function(event1) {
-			kha_input_Sensor._changed(0,event1.accelerationIncludingGravity.x,event1.accelerationIncludingGravity.y,event1.accelerationIncludingGravity.z);
-		};
-	}
-	window.ondeviceorientation = function(event2) {
-		kha_input_Sensor._changed(1,event2.beta,event2.gamma,event2.alpha);
-	};
-};
 kha_SystemImpl.isMobile = function() {
 	var agent = window.navigator.userAgent;
 	if(agent.indexOf("Android") >= 0 || agent.indexOf("webOS") >= 0 || agent.indexOf("BlackBerry") >= 0 || agent.indexOf("Windows Phone") >= 0) {
@@ -3938,7 +3557,6 @@ kha_SystemImpl.loadFinished = function(defaultWidth,defaultHeight) {
 		kha_audio2_Audio1 = kha_js_MobileWebAudio;
 	} else {
 		kha_SystemImpl._hasWebAudio = false;
-		kha_js_AudioElementAudio._compile();
 		kha_audio2_Audio1 = kha_js_AudioElementAudio;
 	}
 	kha_vr_VrInterface.instance = new kha_js_vr_VrInterface();
@@ -4050,7 +3668,7 @@ kha_SystemImpl.unlockSound = function() {
 			context.resume().then(function(c) {
 				kha_SystemImpl.soundEnabled = true;
 			})["catch"](function(err) {
-				haxe_Log.trace(err,{ fileName : "kha/SystemImpl.hx", lineNumber : 616, className : "kha.SystemImpl", methodName : "unlockSound"});
+				haxe_Log.trace(err,{ fileName : "kha/SystemImpl.hx", lineNumber : 615, className : "kha.SystemImpl", methodName : "unlockSound"});
 			});
 		}
 	}
@@ -4314,8 +3932,7 @@ kha_SystemImpl.getGamepads = function() {
 		return null;
 	}
 };
-var kha_Video = function() {
-};
+var kha_Video = function() { };
 $hxClasses["kha.Video"] = kha_Video;
 kha_Video.__name__ = true;
 kha_Video.__interfaces__ = [kha_Resource];
@@ -4651,17 +4268,17 @@ kha_Window.prototype = {
 	,defaultWidth: null
 	,defaultHeight: null
 	,get_width: function() {
-		if(this.canvas.width == 0) {
+		if(this.canvas.clientWidth == 0) {
 			return this.defaultWidth;
 		} else {
-			return this.canvas.width;
+			return this.canvas.clientWidth;
 		}
 	}
 	,get_height: function() {
-		if(this.canvas.height == 0) {
+		if(this.canvas.clientHeight == 0) {
 			return this.defaultHeight;
 		} else {
-			return this.canvas.height;
+			return this.canvas.clientHeight;
 		}
 	}
 	,set_mode: function(mode) {
@@ -12441,6 +12058,12 @@ var kha_graphics4_VertexBuffer = function(vertexCount,structure,usage,instanceDa
 		case 4:
 			this.myStride += 64;
 			break;
+		case 5:
+			this.myStride += 4;
+			break;
+		case 6:
+			this.myStride += 8;
+			break;
 		}
 	}
 	this.buffer = kha_SystemImpl.gl.createBuffer();
@@ -12448,8 +12071,10 @@ var kha_graphics4_VertexBuffer = function(vertexCount,structure,usage,instanceDa
 	this._data = this1;
 	this.sizes = [];
 	this.offsets = [];
+	this.types = [];
 	this.sizes[structure.elements.length - 1] = 0;
 	this.offsets[structure.elements.length - 1] = 0;
+	this.types[structure.elements.length - 1] = 0;
 	var offset = 0;
 	var index = 0;
 	var _g2 = 0;
@@ -12458,25 +12083,40 @@ var kha_graphics4_VertexBuffer = function(vertexCount,structure,usage,instanceDa
 		var element1 = _g3[_g2];
 		++_g2;
 		var size;
+		var type;
 		switch(element1.data) {
 		case 0:
 			size = 1;
+			type = 5126;
 			break;
 		case 1:
 			size = 2;
+			type = 5126;
 			break;
 		case 2:
 			size = 3;
+			type = 5126;
 			break;
 		case 3:
 			size = 4;
+			type = 5126;
 			break;
 		case 4:
 			size = 16;
+			type = 5126;
+			break;
+		case 5:
+			size = 2;
+			type = 5122;
+			break;
+		case 6:
+			size = 4;
+			type = 5122;
 			break;
 		}
 		this.sizes[index] = size;
 		this.offsets[index] = offset;
+		this.types[index] = type;
 		switch(element1.data) {
 		case 0:
 			offset += 4;
@@ -12493,6 +12133,12 @@ var kha_graphics4_VertexBuffer = function(vertexCount,structure,usage,instanceDa
 		case 4:
 			offset += 64;
 			break;
+		case 5:
+			offset += 4;
+			break;
+		case 6:
+			offset += 8;
+			break;
 		}
 		++index;
 	}
@@ -12506,6 +12152,7 @@ kha_graphics4_VertexBuffer.prototype = {
 	,myStride: null
 	,sizes: null
 	,offsets: null
+	,types: null
 	,usage: null
 	,instanceDataStepRate: null
 	,lock: function(start,count) {
@@ -12550,8 +12197,9 @@ kha_graphics4_VertexBuffer.prototype = {
 					++attributesOffset;
 				}
 			} else {
+				var normalized = this.types[i] == 5126 ? false : true;
 				kha_SystemImpl.gl.enableVertexAttribArray(offset + attributesOffset);
-				kha_SystemImpl.gl.vertexAttribPointer(offset + attributesOffset,this.sizes[i],5126,false,this.myStride,this.offsets[i]);
+				kha_SystemImpl.gl.vertexAttribPointer(offset + attributesOffset,this.sizes[i],this.types[i],normalized,this.myStride,this.offsets[i]);
 				if(ext) {
 					if(kha_SystemImpl.gl2) {
 						kha_SystemImpl.gl.vertexAttribDivisor(offset + attributesOffset,this.instanceDataStepRate);
@@ -13010,44 +12658,6 @@ kha_input_MouseImpl.__super__ = kha_input_Mouse;
 kha_input_MouseImpl.prototype = $extend(kha_input_Mouse.prototype,{
 	__class__: kha_input_MouseImpl
 });
-var kha_input_Sensor = function() {
-	this.listeners = [];
-};
-$hxClasses["kha.input.Sensor"] = kha_input_Sensor;
-kha_input_Sensor.__name__ = true;
-kha_input_Sensor.get = function(type) {
-	switch(type._hx_index) {
-	case 0:
-		return kha_input_Sensor.accelerometer;
-	case 1:
-		return kha_input_Sensor.gyroscope;
-	}
-};
-kha_input_Sensor._changed = function(type,x,y,z) {
-	var sensor = kha_input_Sensor.get(type == 0 ? kha_input_SensorType.Accelerometer : kha_input_SensorType.Gyroscope);
-	var _g = 0;
-	var _g1 = sensor.listeners;
-	while(_g < _g1.length) {
-		var listener = _g1[_g];
-		++_g;
-		listener(x,y,z);
-	}
-};
-kha_input_Sensor.prototype = {
-	listeners: null
-	,notify: function(listener) {
-		if(!kha_input_Sensor.isInited) {
-			kha_SystemImpl.initSensor();
-			kha_input_Sensor.isInited = true;
-		}
-		this.listeners.push(listener);
-	}
-	,__class__: kha_input_Sensor
-};
-var kha_input_SensorType = $hxEnums["kha.input.SensorType"] = { __ename__ : true, __constructs__ : ["Accelerometer","Gyroscope"]
-	,Accelerometer: {_hx_index:0,__enum__:"kha.input.SensorType",toString:$estr}
-	,Gyroscope: {_hx_index:1,__enum__:"kha.input.SensorType",toString:$estr}
-};
 var kha_input_Surface = $hx_exports["kha"]["input"]["Surface"] = function() {
 	this.touchStartListeners = [];
 	this.touchEndListeners = [];
@@ -13132,54 +12742,11 @@ kha_internal_BytesBlob.fromBytes = function(bytes) {
 kha_internal_BytesBlob.alloc = function(size) {
 	return new kha_internal_BytesBlob(new haxe_io_Bytes(new ArrayBuffer(size)));
 };
-kha_internal_BytesBlob.readF32 = function(i) {
-	var sign = (i & -2147483648) == 0 ? 1 : -1;
-	var exp = i >> 23 & 255;
-	var man = i & 8388607;
-	switch(exp) {
-	case 0:
-		return 0.0;
-	case 255:
-		if(man != 0) {
-			return NaN;
-		} else if(sign > 0) {
-			return Infinity;
-		} else {
-			return -Infinity;
-		}
-		break;
-	default:
-		return sign * ((man + 8388608) / 8388608.0) * Math.pow(2,exp - 127);
-	}
-};
-kha_internal_BytesBlob.bit = function(value,position) {
-	var b = (value >>> position & 1) == 1;
-	if(b) {
-		var a = 3;
-		++a;
-		return true;
-	} else {
-		var c = 4;
-		--c;
-		return false;
-	}
-};
-kha_internal_BytesBlob.toText = function(chars,length) {
-	var value = "";
-	var _g = 0;
-	var _g1 = length;
-	while(_g < _g1) {
-		var i = _g++;
-		value += String.fromCodePoint(chars[i]);
-	}
-	return value;
-};
 kha_internal_BytesBlob.prototype = {
 	bytes: null
 	,sub: function(start,length) {
 		return new kha_internal_BytesBlob(this.bytes.sub(start,length));
 	}
-	,length: null
 	,get_length: function() {
 		return this.bytes.length;
 	}
@@ -13191,333 +12758,10 @@ kha_internal_BytesBlob.prototype = {
 		++position;
 		return byte;
 	}
-	,readS8: function(position) {
-		var byte = this.bytes.b[position];
-		++position;
-		var sign = (byte & 128) == 0 ? 1 : -1;
-		byte &= 127;
-		return sign * byte;
-	}
-	,readU16BE: function(position) {
-		var first = this.bytes.b[position];
-		var second = this.bytes.b[position + 1];
-		position += 2;
-		return first * 256 + second;
-	}
-	,readU16LE: function(position) {
-		var first = this.bytes.b[position];
-		var second = this.bytes.b[position + 1];
-		position += 2;
-		return second * 256 + first;
-	}
-	,readU32LE: function(position) {
-		var fourth = this.bytes.b[position];
-		var third = this.bytes.b[position + 1];
-		var second = this.bytes.b[position + 2];
-		var first = this.bytes.b[position + 3];
-		position += 4;
-		return fourth + third * 256 + second * 256 * 256 + first * 256 * 256 * 256;
-	}
-	,readU32BE: function(position) {
-		var fourth = this.bytes.b[position];
-		var third = this.bytes.b[position + 1];
-		var second = this.bytes.b[position + 2];
-		var first = this.bytes.b[position + 3];
-		position += 4;
-		return first + second * 256 + third * 256 * 256 + fourth * 256 * 256 * 256;
-	}
-	,readS16BE: function(position) {
-		var first = this.bytes.b[position];
-		var second = this.bytes.b[position + 1];
-		position += 2;
-		var sign = (first & 128) == 0 ? 1 : -1;
-		first &= 127;
-		if(sign == -1) {
-			return -32767 + first * 256 + second;
-		} else {
-			return first * 256 + second;
-		}
-	}
-	,readS16LE: function(position) {
-		var first = this.bytes.b[position];
-		var second = this.bytes.b[position + 1];
-		var sign = (second & 128) == 0 ? 1 : -1;
-		second &= 127;
-		position += 2;
-		if(sign == -1) {
-			return -32767 + second * 256 + first;
-		} else {
-			return second * 256 + first;
-		}
-	}
-	,readS32LE: function(position) {
-		var fourth = this.bytes.b[position];
-		var third = this.bytes.b[position + 1];
-		var second = this.bytes.b[position + 2];
-		var first = this.bytes.b[position + 3];
-		var sign = (first & 128) == 0 ? 1 : -1;
-		first &= 127;
-		position += 4;
-		if(sign == -1) {
-			return -2147483647 + fourth + third * 256 + second * 256 * 256 + first * 256 * 256 * 256;
-		} else {
-			return fourth + third * 256 + second * 256 * 256 + first * 256 * 256 * 256;
-		}
-	}
-	,readS32BE: function(position) {
-		var fourth = this.bytes.b[position];
-		var third = this.bytes.b[position + 1];
-		var second = this.bytes.b[position + 2];
-		var first = this.bytes.b[position + 3];
-		var sign = (fourth & 128) == 0 ? 1 : -1;
-		fourth &= 127;
-		position += 4;
-		if(sign == -1) {
-			return -2147483647 + first + second * 256 + third * 256 * 256 + fourth * 256 * 256 * 256;
-		}
-		return first + second * 256 + third * 256 * 256 + fourth * 256 * 256 * 256;
-	}
-	,readF32LE: function(position) {
-		return kha_internal_BytesBlob.readF32(this.readS32LE(position));
-	}
-	,readF32BE: function(position) {
-		return kha_internal_BytesBlob.readF32(this.readS32BE(position));
-	}
 	,toString: function() {
 		return this.bytes.toString();
 	}
-	,readUtf8Char: function(position) {
-		if(position.value >= this.get_length()) {
-			return -1;
-		}
-		var c = this.readU8(position.value);
-		++position.value;
-		var value = 0;
-		if(!kha_internal_BytesBlob.bit(c,7)) {
-			value = c;
-		} else if(kha_internal_BytesBlob.bit(c,7) && kha_internal_BytesBlob.bit(c,6) && !kha_internal_BytesBlob.bit(c,5)) {
-			var a = c & 31;
-			var c2 = this.readU8(position.value);
-			++position.value;
-			var b = c2 & 63;
-			value = a << 6 | b;
-		} else if(kha_internal_BytesBlob.bit(c,7) && kha_internal_BytesBlob.bit(c,6) && kha_internal_BytesBlob.bit(c,5) && !kha_internal_BytesBlob.bit(c,4)) {
-			position.value += 2;
-		} else if(kha_internal_BytesBlob.bit(c,7) && kha_internal_BytesBlob.bit(c,6) && kha_internal_BytesBlob.bit(c,5) && kha_internal_BytesBlob.bit(c,4) && !kha_internal_BytesBlob.bit(c,3)) {
-			position.value += 3;
-		}
-		return value;
-	}
-	,readUtf8Block: function(buffer,position) {
-		var bufferindex = 0;
-		if(position.value >= this.get_length()) {
-			return "";
-		}
-		while(bufferindex < 2000) {
-			var c = this.readUtf8Char(position);
-			if(c < 0) {
-				break;
-			}
-			buffer[bufferindex] = c;
-			++bufferindex;
-		}
-		return kha_internal_BytesBlob.toText(buffer,bufferindex);
-	}
-	,readUtf8String: function() {
-		var this1 = new Array(2000);
-		var buffer = this1;
-		var text = "";
-		var start = 0;
-		if(this.get_length() >= 3 && this.bytes.b[0] == 239 && this.bytes.b[1] == 187 && this.bytes.b[2] == 191) {
-			start = 3;
-		}
-		var position = { value : start};
-		while(position.value < this.get_length()) text += this.readUtf8Block(buffer,position);
-		return text;
-	}
-	,toBytes: function() {
-		return this.bytes;
-	}
-	,unload: function() {
-		this.bytes = null;
-	}
 	,__class__: kha_internal_BytesBlob
-};
-var kha_internal_HdrFormat = function() { };
-$hxClasses["kha.internal.HdrFormat"] = kha_internal_HdrFormat;
-kha_internal_HdrFormat.__name__ = true;
-kha_internal_HdrFormat.readBuf = function(buf) {
-	var bytesRead = 0;
-	while(true) {
-		buf[bytesRead++] = kha_internal_HdrFormat.buffer[kha_internal_HdrFormat.fileOffset] & 255;
-		if(!(++kha_internal_HdrFormat.fileOffset < kha_internal_HdrFormat.bufferLength && bytesRead < buf.length)) {
-			break;
-		}
-	}
-	return bytesRead;
-};
-kha_internal_HdrFormat.readBufOffset = function(buf,offset,length) {
-	var bytesRead = 0;
-	while(true) {
-		buf[offset + bytesRead++] = kha_internal_HdrFormat.buffer[kha_internal_HdrFormat.fileOffset] & 255;
-		if(!(++kha_internal_HdrFormat.fileOffset < kha_internal_HdrFormat.bufferLength && bytesRead < length)) {
-			break;
-		}
-	}
-	return bytesRead;
-};
-kha_internal_HdrFormat.readPixelsRaw = function(buffer,data,offset,numpixels) {
-	var numExpected = 4 * numpixels;
-	var numRead = kha_internal_HdrFormat.readBufOffset(data,offset,numExpected);
-	if(numRead < numExpected) {
-		haxe_Log.trace("Error reading raw pixels: got " + numRead + " bytes, expected " + numExpected,{ fileName : "kha/internal/HdrFormat.hx", lineNumber : 43, className : "kha.internal.HdrFormat", methodName : "readPixelsRaw"});
-		return;
-	}
-};
-kha_internal_HdrFormat.readPixelsRawRLE = function(buffer,data,offset,scanline_width,num_scanlines) {
-	var this1 = new Uint8Array(4);
-	var rgbe = this1;
-	var scanline_buffer = null;
-	var ptr;
-	var ptr_end;
-	var count;
-	var this2 = new Uint8Array(2);
-	var buf = this2;
-	var bufferLength = buffer.length;
-	while(num_scanlines > 0) {
-		if(kha_internal_HdrFormat.readBuf(rgbe) < rgbe.length) {
-			haxe_Log.trace("Error reading bytes: expected " + rgbe.length,{ fileName : "kha/internal/HdrFormat.hx", lineNumber : 59, className : "kha.internal.HdrFormat", methodName : "readPixelsRawRLE"});
-			return;
-		}
-		if(rgbe[0] != 2 || rgbe[1] != 2 || (rgbe[2] & 128) != 0) {
-			data[offset++] = rgbe[0] & 255;
-			data[offset++] = rgbe[1] & 255;
-			data[offset++] = rgbe[2] & 255;
-			data[offset++] = rgbe[3] & 255;
-			kha_internal_HdrFormat.readPixelsRaw(buffer,data,offset,scanline_width * num_scanlines - 1);
-			return;
-		}
-		if(((rgbe[2] & 255) << 8 | rgbe[3] & 255) != scanline_width) {
-			haxe_Log.trace("Wrong scanline width " + ((rgbe[2] & 255) << 8 | rgbe[3] & 255) + ", expected " + scanline_width,{ fileName : "kha/internal/HdrFormat.hx", lineNumber : 74, className : "kha.internal.HdrFormat", methodName : "readPixelsRawRLE"});
-			return;
-		}
-		if(scanline_buffer == null) {
-			var this3 = new Uint8Array(4 * scanline_width);
-			scanline_buffer = this3;
-		}
-		ptr = 0;
-		var _g = 0;
-		while(_g < 4) {
-			var i = _g++;
-			ptr_end = (i + 1) * scanline_width;
-			while(ptr < ptr_end) {
-				if(kha_internal_HdrFormat.readBuf(buf) < buf.length) {
-					haxe_Log.trace("Error reading 2-byte buffer",{ fileName : "kha/internal/HdrFormat.hx", lineNumber : 88, className : "kha.internal.HdrFormat", methodName : "readPixelsRawRLE"});
-					return;
-				}
-				if((buf[0] & 255) > 128) {
-					count = (buf[0] & 255) - 128;
-					if(count == 0 || count > ptr_end - ptr) {
-						haxe_Log.trace("Bad scanline data",{ fileName : "kha/internal/HdrFormat.hx", lineNumber : 95, className : "kha.internal.HdrFormat", methodName : "readPixelsRawRLE"});
-						return;
-					}
-					while(count-- > 0) scanline_buffer[ptr++] = buf[1] & 255;
-				} else {
-					count = buf[0] & 255;
-					if(count == 0 || count > ptr_end - ptr) {
-						haxe_Log.trace("Bad scanline data",{ fileName : "kha/internal/HdrFormat.hx", lineNumber : 106, className : "kha.internal.HdrFormat", methodName : "readPixelsRawRLE"});
-						return;
-					}
-					scanline_buffer[ptr++] = buf[1] & 255;
-					if(--count > 0) {
-						if(kha_internal_HdrFormat.readBufOffset(scanline_buffer,ptr,count) < count) {
-							haxe_Log.trace("Error reading non-run data",{ fileName : "kha/internal/HdrFormat.hx", lineNumber : 112, className : "kha.internal.HdrFormat", methodName : "readPixelsRawRLE"});
-							return;
-						}
-						ptr += count;
-					}
-				}
-			}
-		}
-		var _g1 = 0;
-		var _g2 = scanline_width;
-		while(_g1 < _g2) {
-			var i1 = _g1++;
-			data[offset] = scanline_buffer[i1] & 255;
-			data[offset + 1] = scanline_buffer[i1 + scanline_width] & 255;
-			data[offset + 2] = scanline_buffer[i1 + 2 * scanline_width] & 255;
-			data[offset + 3] = scanline_buffer[i1 + 3 * scanline_width] & 255;
-			offset += 4;
-		}
-		--num_scanlines;
-	}
-};
-kha_internal_HdrFormat.readLine = function() {
-	var buf = "";
-	while(true) {
-		var b = kha_internal_HdrFormat.buffer[kha_internal_HdrFormat.fileOffset];
-		if(b == 10) {
-			++kha_internal_HdrFormat.fileOffset;
-			break;
-		}
-		buf += String.fromCodePoint(b);
-		if(!(++kha_internal_HdrFormat.fileOffset < kha_internal_HdrFormat.bufferLength)) {
-			break;
-		}
-	}
-	return buf;
-};
-kha_internal_HdrFormat.parse = function(bytes) {
-	kha_internal_HdrFormat.buffer = haxe_io__$UInt8Array_UInt8Array_$Impl_$.fromBytes(bytes);
-	kha_internal_HdrFormat.bufferLength = kha_internal_HdrFormat.buffer.length;
-	kha_internal_HdrFormat.fileOffset = 0;
-	var width = 0;
-	var height = 0;
-	var exposure = 1.0;
-	var gamma = 1.0;
-	var rle = false;
-	var _g = 0;
-	while(_g < 20) {
-		var i = _g++;
-		var line = kha_internal_HdrFormat.readLine();
-		if(kha_internal_HdrFormat.formatPattern.match(line)) {
-			rle = true;
-		} else if(kha_internal_HdrFormat.exposurePattern.match(line)) {
-			exposure = parseFloat(kha_internal_HdrFormat.exposurePattern.matched(1));
-		} else if(kha_internal_HdrFormat.widthHeightPattern.match(line)) {
-			height = Std.parseInt(kha_internal_HdrFormat.widthHeightPattern.matched(1));
-			width = Std.parseInt(kha_internal_HdrFormat.widthHeightPattern.matched(2));
-			break;
-		}
-	}
-	if(!rle) {
-		haxe_Log.trace("File is not run length encoded!",{ fileName : "kha/internal/HdrFormat.hx", lineNumber : 175, className : "kha.internal.HdrFormat", methodName : "parse"});
-		return null;
-	}
-	var this1 = new Uint8Array(width * height * 4);
-	var data = this1;
-	var scanline_width = width;
-	var num_scanlines = height;
-	kha_internal_HdrFormat.readPixelsRawRLE(kha_internal_HdrFormat.buffer,data,0,scanline_width,num_scanlines);
-	var this2 = new Float32Array(width * height * 4);
-	var floatData = this2;
-	var offset = 0;
-	while(offset < data.length) {
-		var r = data[offset] / 255;
-		var g = data[offset + 1] / 255;
-		var b = data[offset + 2] / 255;
-		var e = data[offset + 3];
-		var f = Math.pow(2.0,e - 128.0);
-		r *= f;
-		g *= f;
-		b *= f;
-		floatData[offset] = r;
-		floatData[offset + 1] = g;
-		floatData[offset + 2] = b;
-		floatData[offset + 3] = 1.0;
-		offset += 4;
-	}
-	return { width : width, height : height, data : floatData};
 };
 var kha_js_AEAudioChannel = function(element) {
 	this.stopped = false;
@@ -13549,8 +12793,6 @@ kha_js_AEAudioChannel.prototype = {
 var kha_js_AudioElementAudio = function() { };
 $hxClasses["kha.js.AudioElementAudio"] = kha_js_AudioElementAudio;
 kha_js_AudioElementAudio.__name__ = true;
-kha_js_AudioElementAudio._compile = function() {
-};
 kha_js_AudioElementAudio.play = function(sound,loop) {
 	if(loop == null) {
 		loop = false;
@@ -13703,24 +12945,9 @@ var kha_js_Font = function(blob) {
 $hxClasses["kha.js.Font"] = kha_js_Font;
 kha_js_Font.__name__ = true;
 kha_js_Font.__interfaces__ = [kha_Resource];
-kha_js_Font.fromBytes = function(bytes) {
-	return new kha_js_Font(kha_internal_BytesBlob.fromBytes(bytes));
-};
 kha_js_Font.prototype = {
 	kravur: null
 	,images: null
-	,height: function(fontSize) {
-		return this.kravur._get(fontSize).getHeight();
-	}
-	,width: function(fontSize,str) {
-		return this.kravur._get(fontSize).stringWidth(str);
-	}
-	,widthOfCharacters: function(fontSize,characters,start,length) {
-		return this.kravur._get(fontSize).charactersWidth(characters,start,length);
-	}
-	,baseline: function(fontSize) {
-		return this.kravur._get(fontSize).getBaselinePosition();
-	}
 	,getImage: function(fontSize,color) {
 		var glyphs = kha_graphics2_Graphics.fontGlyphs;
 		var imageIndex = fontSize * 10000 + glyphs.length;
@@ -13755,10 +12982,6 @@ kha_js_Font.prototype = {
 			return img;
 		}
 		return this.images.h[imageIndex].h[color];
-	}
-	,unload: function() {
-		this.kravur = null;
-		this.images = null;
 	}
 	,__class__: kha_js_Font
 };
@@ -13932,150 +13155,6 @@ kha_js_Sound.prototype = $extend(kha_Sound.prototype,{
 	}
 	,__class__: kha_js_Sound
 });
-var kha_js_Video = function() {
-	kha_Video.call(this);
-};
-$hxClasses["kha.js.Video"] = kha_js_Video;
-kha_js_Video.__name__ = true;
-kha_js_Video.fromFile = function(filenames,done) {
-	var video = new kha_js_Video();
-	video.done = done;
-	video.element = window.document.createElement("video");
-	video.filenames = [];
-	var _g = 0;
-	while(_g < filenames.length) {
-		var filename = filenames[_g];
-		++_g;
-		if(video.element.canPlayType("video/webm") != "" && StringTools.endsWith(filename,".webm")) {
-			video.filenames.push(filename);
-		}
-		if(video.element.canPlayType("video/mp4") != "" && StringTools.endsWith(filename,".mp4")) {
-			video.filenames.push(filename);
-		}
-	}
-	video.element.addEventListener("error",$bind(video,video.errorListener),false);
-	video.element.addEventListener("canplaythrough",$bind(video,video.canPlayThroughListener),false);
-	video.element.preload = "auto";
-	video.element.src = video.filenames[0];
-};
-kha_js_Video.__super__ = kha_Video;
-kha_js_Video.prototype = $extend(kha_Video.prototype,{
-	filenames: null
-	,element: null
-	,done: null
-	,texture: null
-	,errorListener: function(eventInfo) {
-		if(this.element.error.code == 4) {
-			var _g = 0;
-			var _g1 = this.filenames.length - 1;
-			while(_g < _g1) {
-				var i = _g++;
-				if(this.element.src == this.filenames[i]) {
-					this.element.src = this.filenames[i + 1];
-					return;
-				}
-			}
-		}
-		haxe_Log.trace("Error loading " + this.element.src,{ fileName : "kha/js/Video.hx", lineNumber : 120, className : "kha.js.Video", methodName : "errorListener"});
-		this.finishAsset();
-	}
-	,canPlayThroughListener: function(eventInfo) {
-		this.finishAsset();
-	}
-	,finishAsset: function() {
-		this.element.removeEventListener("error",$bind(this,this.errorListener),false);
-		this.element.removeEventListener("canplaythrough",$bind(this,this.canPlayThroughListener),false);
-		if(kha_SystemImpl.gl != null) {
-			this.texture = kha_Image.fromVideo(this);
-		}
-		this.done(this);
-	}
-	,__class__: kha_js_Video
-});
-var kha_js_WebAudioSound = function(filename,done,failed) {
-	var _gthis = this;
-	kha_Sound.call(this);
-	var request = new XMLHttpRequest();
-	request.open("GET",filename,true);
-	request.responseType = "arraybuffer";
-	request.onerror = function() {
-		failed({ url : filename});
-	};
-	request.onload = function() {
-		_gthis.compressedData = haxe_io_Bytes.ofData(request.response);
-		_gthis.uncompressedData = null;
-		done(_gthis);
-	};
-	request.send(null);
-};
-$hxClasses["kha.js.WebAudioSound"] = kha_js_WebAudioSound;
-kha_js_WebAudioSound.__name__ = true;
-kha_js_WebAudioSound.__super__ = kha_Sound;
-kha_js_WebAudioSound.prototype = $extend(kha_Sound.prototype,{
-	superUncompress: function(done) {
-		kha_Sound.prototype.uncompress.call(this,done);
-	}
-	,uncompress: function(done) {
-		var _gthis = this;
-		kha_audio2_Audio._context.decodeAudioData(this.compressedData.b.bufferValue,function(buffer) {
-			var ch0 = buffer.getChannelData(0);
-			var len = ch0.length;
-			var this1 = new Float32Array(len * 2);
-			_gthis.uncompressedData = this1;
-			if(buffer.numberOfChannels == 1) {
-				var idx = 0;
-				var i = 0;
-				var lidx = len * 2;
-				var uncompressInner = function() {
-				};
-				uncompressInner = function() {
-					var chk_len = idx + 11025;
-					var next_chk = chk_len > lidx ? lidx : chk_len;
-					while(idx < next_chk) {
-						_gthis.uncompressedData[idx] = ch0[i];
-						_gthis.uncompressedData[idx + 1] = ch0[i];
-						idx += 2;
-						i += 1;
-					}
-					if(idx < lidx) {
-						window.setTimeout(uncompressInner,0);
-					} else {
-						_gthis.compressedData = null;
-					}
-				};
-				uncompressInner();
-				window.setTimeout(done,250);
-			} else {
-				var ch1 = buffer.getChannelData(1);
-				var idx1 = 0;
-				var i1 = 0;
-				var lidx1 = len * 2;
-				var uncompressInner1 = function() {
-				};
-				uncompressInner1 = function() {
-					var chk_len1 = idx1 + 11025;
-					var next_chk1 = chk_len1 > lidx1 ? lidx1 : chk_len1;
-					while(idx1 < next_chk1) {
-						_gthis.uncompressedData[idx1] = ch0[i1];
-						_gthis.uncompressedData[idx1 + 1] = ch1[i1];
-						idx1 += 2;
-						i1 += 1;
-					}
-					if(idx1 < lidx1) {
-						window.setTimeout(uncompressInner1,0);
-					} else {
-						_gthis.compressedData = null;
-					}
-				};
-				uncompressInner1();
-				window.setTimeout(done,250);
-			}
-		},function() {
-			_gthis.superUncompress(done);
-		});
-	}
-	,__class__: kha_js_WebAudioSound
-});
 var kha_js_graphics4_ConstantLocation = function(value,type) {
 	this.value = value;
 	this.type = type;
@@ -14099,6 +13178,7 @@ var kha_js_graphics4_Graphics = function(renderTarget) {
 	this.colorMaskRed = true;
 	this.depthMask = false;
 	this.depthTest = false;
+	this.currentPipeline = null;
 	this.renderTarget = renderTarget;
 	this.init();
 	if(kha_SystemImpl.gl2) {
@@ -14150,7 +13230,8 @@ kha_js_graphics4_Graphics.getBlendOp = function(op) {
 	}
 };
 kha_js_graphics4_Graphics.prototype = {
-	depthTest: null
+	currentPipeline: null
+	,depthTest: null
 	,depthMask: null
 	,colorMaskRed: null
 	,colorMaskGreen: null
@@ -14218,25 +13299,25 @@ kha_js_graphics4_Graphics.prototype = {
 		case 0:
 			break;
 		case 1280:
-			haxe_Log.trace("WebGL error: Invalid enum",{ fileName : "kha/js/graphics4/Graphics.hx", lineNumber : 124, className : "kha.js.graphics4.Graphics", methodName : "end"});
+			haxe_Log.trace("WebGL error: Invalid enum",{ fileName : "kha/js/graphics4/Graphics.hx", lineNumber : 130, className : "kha.js.graphics4.Graphics", methodName : "end"});
 			break;
 		case 1281:
-			haxe_Log.trace("WebGL error: Invalid value",{ fileName : "kha/js/graphics4/Graphics.hx", lineNumber : 126, className : "kha.js.graphics4.Graphics", methodName : "end"});
+			haxe_Log.trace("WebGL error: Invalid value",{ fileName : "kha/js/graphics4/Graphics.hx", lineNumber : 132, className : "kha.js.graphics4.Graphics", methodName : "end"});
 			break;
 		case 1282:
-			haxe_Log.trace("WebGL error: Invalid operation",{ fileName : "kha/js/graphics4/Graphics.hx", lineNumber : 128, className : "kha.js.graphics4.Graphics", methodName : "end"});
+			haxe_Log.trace("WebGL error: Invalid operation",{ fileName : "kha/js/graphics4/Graphics.hx", lineNumber : 134, className : "kha.js.graphics4.Graphics", methodName : "end"});
 			break;
 		case 1285:
-			haxe_Log.trace("WebGL error: Out of memory",{ fileName : "kha/js/graphics4/Graphics.hx", lineNumber : 132, className : "kha.js.graphics4.Graphics", methodName : "end"});
+			haxe_Log.trace("WebGL error: Out of memory",{ fileName : "kha/js/graphics4/Graphics.hx", lineNumber : 138, className : "kha.js.graphics4.Graphics", methodName : "end"});
 			break;
 		case 1286:
-			haxe_Log.trace("WebGL error: Invalid framebuffer operation",{ fileName : "kha/js/graphics4/Graphics.hx", lineNumber : 130, className : "kha.js.graphics4.Graphics", methodName : "end"});
+			haxe_Log.trace("WebGL error: Invalid framebuffer operation",{ fileName : "kha/js/graphics4/Graphics.hx", lineNumber : 136, className : "kha.js.graphics4.Graphics", methodName : "end"});
 			break;
 		case 37442:
-			haxe_Log.trace("WebGL error: Context lost",{ fileName : "kha/js/graphics4/Graphics.hx", lineNumber : 134, className : "kha.js.graphics4.Graphics", methodName : "end"});
+			haxe_Log.trace("WebGL error: Context lost",{ fileName : "kha/js/graphics4/Graphics.hx", lineNumber : 140, className : "kha.js.graphics4.Graphics", methodName : "end"});
 			break;
 		default:
-			haxe_Log.trace("Unknown WebGL error",{ fileName : "kha/js/graphics4/Graphics.hx", lineNumber : 136, className : "kha.js.graphics4.Graphics", methodName : "end"});
+			haxe_Log.trace("Unknown WebGL error",{ fileName : "kha/js/graphics4/Graphics.hx", lineNumber : 142, className : "kha.js.graphics4.Graphics", methodName : "end"});
 		}
 	}
 	,clear: function(color,depth,stencil) {
@@ -14439,6 +13520,7 @@ kha_js_graphics4_Graphics.prototype = {
 		this.setDepthMode(pipe.depthWrite,pipe.depthMode);
 		this.setStencilParameters(pipe.stencilMode,pipe.stencilBothPass,pipe.stencilDepthFail,pipe.stencilFail,pipe.stencilReferenceValue,pipe.stencilReadMask,pipe.stencilWriteMask);
 		this.setBlendingMode(pipe.blendSource,pipe.blendDestination,pipe.blendOperation,pipe.alphaBlendSource,pipe.alphaBlendDestination,pipe.alphaBlendOperation);
+		this.currentPipeline = pipe;
 		pipe.set();
 		this.colorMaskRed = pipe.colorWriteMasksRed[0];
 		this.colorMaskGreen = pipe.colorWriteMasksGreen[0];
@@ -14856,19 +13938,31 @@ var khm_imgui_Imgui = function(sets) {
 	_g4.push(0);
 	_g4.push(0);
 	_g4.push(0);
-	this.hoverIds = _g4;
+	this.lastHoverIds = _g4;
 	var _g5 = [];
-	_g5.push({ id : 0, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false});
-	_g5.push({ id : 1, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false});
-	_g5.push({ id : 2, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false});
-	_g5.push({ id : 3, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false});
-	_g5.push({ id : 4, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false});
-	_g5.push({ id : 5, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false});
-	_g5.push({ id : 6, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false});
-	_g5.push({ id : 7, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false});
-	_g5.push({ id : 8, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false});
-	_g5.push({ id : 9, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isActive : false});
-	this.pointers = _g5;
+	_g5.push(0);
+	_g5.push(0);
+	_g5.push(0);
+	_g5.push(0);
+	_g5.push(0);
+	_g5.push(0);
+	_g5.push(0);
+	_g5.push(0);
+	_g5.push(0);
+	_g5.push(0);
+	this.hoverIds = _g5;
+	var _g6 = [];
+	_g6.push({ id : 0, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false});
+	_g6.push({ id : 1, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false});
+	_g6.push({ id : 2, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false});
+	_g6.push({ id : 3, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false});
+	_g6.push({ id : 4, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false});
+	_g6.push({ id : 5, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false});
+	_g6.push({ id : 6, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false});
+	_g6.push({ id : 7, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false});
+	_g6.push({ id : 8, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false});
+	_g6.push({ id : 9, startX : 0, startY : 0, x : 0, y : 0, moveX : 0, moveY : 0, type : 0, isDown : false, isTouch : false, isActive : false});
+	this.pointers = _g6;
 	this.autoNotifyInput = sets.autoNotifyInput;
 	this.redrawOnEvents = sets.redrawOnEvents;
 	this.debug = sets.debug;
@@ -14887,6 +13981,7 @@ khm_imgui_Imgui.__name__ = true;
 khm_imgui_Imgui.prototype = {
 	pointers: null
 	,hoverIds: null
+	,lastHoverIds: null
 	,activeIds: null
 	,widgetGroups: null
 	,focusId: null
@@ -14918,7 +14013,20 @@ khm_imgui_Imgui.prototype = {
 		this.keyboardFocus = false;
 		this.pointersDown[p.id] = true;
 		if(this.redrawOnEvents) {
-			this.activeIds[p.id] = this.hoverIds[p.id];
+			if(p.isTouch) {
+				var _g = 0;
+				var _g1 = this.lastFrame;
+				while(_g < _g1.length) {
+					var rect = _g1[_g];
+					++_g;
+					this.checkWidgetState(rect);
+					if(this.activeIds[p.id] != 0) {
+						break;
+					}
+				}
+			} else {
+				this.activeIds[p.id] = this.hoverIds[p.id];
+			}
 		}
 		return this.isPointerBlocked(p.id,p.x,p.y);
 	}
@@ -14979,6 +14087,7 @@ khm_imgui_Imgui.prototype = {
 		this.pointers[0].type = button;
 		this.pointers[0].isDown = true;
 		this.pointers[0].isActive = true;
+		this.pointers[0].isTouch = false;
 		return this.onPointerDown(this.pointers[0]);
 	}
 	,onMouseMove: function(x,y,mx,my) {
@@ -15093,6 +14202,7 @@ khm_imgui_Imgui.prototype = {
 		var _g1 = this.hoverIds.length;
 		while(_g < _g1) {
 			var i = _g++;
+			this.lastHoverIds[i] = this.hoverIds[i];
 			this.hoverIds[i] = 0;
 			this.widgetGroups[i] = 0;
 		}
@@ -15200,7 +14310,7 @@ khm_imgui_Imgui.prototype = {
 		while(_g < _g1.length) {
 			var p = _g1[_g];
 			++_g;
-			if(!p.isActive) {
+			if(!this.pointersDown[p.id] && !p.isActive) {
 				continue;
 			}
 			if(p.x < x || p.y < y || p.x >= x + w || p.y >= y + h) {
@@ -15332,9 +14442,20 @@ khm_imgui_Imgui.prototype = {
 		while(_g < _g1.length) {
 			var p = _g1[_g];
 			++_g;
-			if(this.activeIds[p.id] == id && (this.hoverIds[p.id] == id || this.focusId == id) && !this.pointersDown[p.id]) {
-				return true;
+			if(this.activeIds[p.id] != id) {
+				continue;
 			}
+			if(this.pointersDown[p.id]) {
+				continue;
+			}
+			if(!p.isTouch) {
+				if(this.hoverIds[p.id] != id && this.focusId != id) {
+					continue;
+				}
+			} else if(this.lastHoverIds[p.id] != id) {
+				continue;
+			}
+			return true;
 		}
 		return false;
 	}
@@ -15699,7 +14820,7 @@ khm_imgui_widgets_Input.inputLine = function(ui,x,y,input) {
 		break;
 	}
 	g.set_color(tmp1);
-	g.drawRect(x + 0.5,y + 0.5,w - 0.5,h - 0.5);
+	g.drawRect(x + 0.5,y + 0.5,w - 1,h - 1);
 	khm_imgui_Widgets.scissor(ui,x + 1,y,w - 2,h);
 	var cx = input.camera.x;
 	var cy = input.camera.y;
@@ -16401,13 +15522,6 @@ kha_input_Gamepad.connectListeners = [];
 kha_input_Gamepad.disconnectListeners = [];
 kha_input_Keyboard.__meta__ = { fields : { sendDownEvent : { input : null}, sendUpEvent : { input : null}, sendPressEvent : { input : null}}};
 kha_input_Mouse.__meta__ = { fields : { sendLeaveEvent : { input : null}, sendDownEvent : { input : null}, sendUpEvent : { input : null}, sendMoveEvent : { input : null}, sendWheelEvent : { input : null}}};
-kha_input_Sensor.isInited = false;
-kha_input_Sensor.accelerometer = new kha_input_Sensor();
-kha_input_Sensor.gyroscope = new kha_input_Sensor();
-kha_internal_BytesBlob.bufferSize = 2000;
-kha_internal_HdrFormat.exposurePattern = new EReg("EXPOSURE=\\s*([0-9]*[.][0-9]*)","i");
-kha_internal_HdrFormat.formatPattern = new EReg("FORMAT=32-bit_rle_rgbe","i");
-kha_internal_HdrFormat.widthHeightPattern = new EReg("-Y ([0-9]+) \\+X ([0-9]+)","i");
 kha_js_AEAudioChannel.todo = [];
 kha_js_Sound.loading = [];
 kha_netsync_ControllerBuilder.nextId = 0;
