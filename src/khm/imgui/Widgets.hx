@@ -2,6 +2,7 @@ package khm.imgui;
 
 import kha.graphics2.Graphics;
 import kha.input.KeyCode;
+import kha.Image;
 import khm.imgui.widgets.Input;
 import khm.imgui.widgets.Panel;
 import khm.imgui.widgets.Select in Sel;
@@ -58,6 +59,37 @@ class Widgets {
 		final textW = g.font.width(g.fontSize, text);
 		final textH = g.font.height(g.fontSize);
 		g.drawString(text, x + w / 2 - textW / 2, y + h / 2 - textH / 2);
+
+		return ui.isWidgetClicked(id);
+	}
+
+	public static function imageButton(ui:Imgui, x:Int, y:Int, img:Image):Bool {
+		final g = ui.g;
+		final id = ui.getId();
+		final w = buttonW;
+		final h = buttonH;
+		final rect = new WidgetRect(id, x, y, w, h);
+		ui.addWidget(rect);
+		ui.checkWidgetState(rect);
+
+		if (ui.isFocused(id)) drawFocusBorder(g, rect);
+
+		final state = ui.getWidgetState(id);
+		g.color = switch (state) {
+			case Idle: bgColor;
+			case Hover, Focus: hoverColor;
+			case Active: activeColor;
+		}
+		g.fillRect(x, y, w, h);
+
+		g.color = 0xFFFFFFFF;
+		final imgW = img.width > w ? w : img.width;
+		final imgH = img.height > h ? h : img.height;
+		g.drawScaledImage(img,
+			x + w / 2 - imgW / 2,
+			y + h / 2 - imgH / 2,
+			imgW, imgH
+		);
 
 		return ui.isWidgetClicked(id);
 	}
