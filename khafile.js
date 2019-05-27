@@ -6,5 +6,7 @@ project.addAssets('res/**', {
 });
 project.addSources('src');
 project.addParameter('-dce full');
+project.addDefine('analyzer-optimize');
+project.addDefine('kha_no_ogg');
 
 resolve(project);

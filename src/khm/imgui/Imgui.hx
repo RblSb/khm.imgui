@@ -43,10 +43,11 @@ class Imgui {
 	final pointersUp:Array<Bool> = [for (i in 0...PNUM) false];
 	final blockedKeys:Map<KeyCode, Bool> = [];
 	final keys:Map<KeyCode, Bool> = [];
-	var lastFrame:Array<WidgetRect> = [];
-	var frame:Array<WidgetRect> = [];
+	final lastFrame = new Frame();
+	final frame = new Frame();
 	final callbacks:Array<()->Void> = [];
-	var scissorRect:Null<WidgetRect>;
+	final scissorRect = new WidgetRect(0, 0, 0, 0, 0);
+	var scissorEnabled = false;
 	var oldG:Null<Graphics>;
 	var focusItemId = 0;
 	var id = 0;
@@ -300,7 +301,7 @@ class Imgui {
 			return;
 		}
 		for (i in 0...lastFrame.length) {
-			final item = lastFrame[i];
+			final item = lastFrame.get(i);
 			if (item.id == focusId) {
 				focusItemId = i + side;
 				break;
@@ -314,7 +315,7 @@ class Imgui {
 	function focusItem(id:Int):Void {
 		if (lastFrame.length == 0) return;
 		focusItemId = id;
-		setFocus(lastFrame[focusItemId].id);
+		setFocus(lastFrame.get(focusItemId).id);
 		for (i in keys.keys()) keys[i] = false;
 	}
 
@@ -355,8 +356,8 @@ class Imgui {
 		textToPaste = "";
 		isCutText = false;
 		isCopyText = false;
-		lastFrame = frame;
-		frame = [];
+		lastFrame.copyFrom(frame);
+		frame.clear();
 		if (!debug) return;
 		final temp = FastMatrix3.identity();
 		temp.setFrom(g.transformation);
@@ -388,27 +389,36 @@ class Imgui {
 	}
 
 	/** Add widget rect to current frame. Must be called for each widget that can be selected. **/
-	public function addWidget(rect:WidgetRect):Void {
-		if (scissorRect != null) {
-			final s = scissorRect;
-			final difX = s.x - rect.x;
-			final difY = s.y - rect.y;
-			if (difX > 0) {rect.x += difX; rect.w -= difX;}
-			if (difY > 0) {rect.y += difY; rect.h -= difY;}
+	public inline function addWidget(rect:WidgetRect):Void {
+		addWidgetData(
+			rect.id, rect.x, rect.y,
+			rect.w, rect.h, rect.group
+		);
+		rect.setFrom(frame.get(frame.length - 1));
+	}
 
-			final difX = rect.w + rect.x - s.w - s.x;
-			final difY = rect.h + rect.y - s.h - s.y;
-			if (difX > 0) rect.w -= difX;
-			if (difY > 0) rect.h -= difY;
-			if (rect.w < 0) rect.w = 0;
-			if (rect.h < 0) rect.h = 0;
+	function addWidgetData(id:Int, x:Int, y:Int, w:Int, h:Int, group:Int):Void {
+		if (scissorEnabled) {
+			final s = scissorRect;
+			final difX = s.x - x;
+			final difY = s.y - y;
+			if (difX > 0) {x += difX; w -= difX;}
+			if (difY > 0) {y += difY; h -= difY;}
+
+			final difX = w + x - s.w - s.x;
+			final difY = h + y - s.h - s.y;
+			if (difX > 0) w -= difX;
+			if (difY > 0) h -= difY;
+			if (w < 0) w = 0;
+			if (h < 0) h = 0;
 		}
 		final scaleX = g.transformation._00;
 		final scaleY = g.transformation._11;
-		rect.x = Std.int(rect.x * scaleX);
-		rect.y = Std.int(rect.y * scaleY);
-		rect.w = Std.int(rect.w * scaleX);
-		rect.h = Std.int(rect.h * scaleY);
+		x = Std.int(x * scaleX);
+		y = Std.int(y * scaleY);
+		w = Std.int(w * scaleX);
+		h = Std.int(h * scaleY);
+		final rect = new WidgetRect(id, x, y, w, h, group);
 		frame.push(rect);
 	}
 
@@ -417,18 +427,23 @@ class Imgui {
 		Then it checks that there is no active widget in the same widget group.
 		Set widget hovered if that's true. Also set widget active if pointer down.
 	**/
-	public function checkWidgetState(rect:WidgetRect):Void {
+	public inline function checkWidgetState(rect:WidgetRect):Void {
 		final p = isInside(rect.id, rect.x, rect.y, rect.w, rect.h);
 		if (p == null) return;
+		if (isWidgetGroupExists(rect.group)) return;
 		final id = p.id;
-		if (rect.group != 0) {
-			for (i in 0...widgetGroups.length) {
-				if (widgetGroups[i] == rect.group) return;
-			}
-			widgetGroups[id] = rect.group;
-		}
+		widgetGroups[id] = rect.group;
 		setHover(id, rect.id);
 		if (activeIds[id] == 0 && pointersDown[id]) setActive(id, rect.id);
+	}
+
+	function isWidgetGroupExists(group:Int):Bool {
+		if (group != 0) {
+			for (i in 0...widgetGroups.length) {
+				if (widgetGroups[i] == group) return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -566,7 +581,8 @@ class Imgui {
 
 	/** Set widgets rect restriction. Useful for widgets with scrolling. **/
 	public function scissor(x:Int, y:Int, w:Int, h:Int):Void {
-		scissorRect = new WidgetRect(0, x, y, w, h);
+		scissorEnabled = true;
+		scissorRect.setFrom(new WidgetRect(0, x, y, w, h));
 		if (!debug) return;
 		final rect = scissorRect;
 		final color = g.color;
@@ -577,12 +593,12 @@ class Imgui {
 
 	/** Removes widgets rect restriction. **/
 	public inline function disableScissor():Void {
-		scissorRect = null;
+		scissorEnabled = false;
 	}
 
-	/** Set custom graphics2 context.Useful for caching sub-widgets. **/
+	/** Set custom graphics2 context. Useful for caching sub-widgets. **/
 	public inline function setGraphics(newG:Graphics):Void {
-		oldG = g;
+		if (oldG == null) oldG = g;
 		g = newG;
 	}
 
