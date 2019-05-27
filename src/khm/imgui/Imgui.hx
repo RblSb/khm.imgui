@@ -45,6 +45,7 @@ class Imgui {
 	final keys:Map<KeyCode, Bool> = [];
 	var lastFrame:Array<WidgetRect> = [];
 	var frame:Array<WidgetRect> = [];
+	final callbacks:Array<()->Void> = [];
 	var scissorRect:Null<WidgetRect>;
 	var oldG:Null<Graphics>;
 	var focusItemId = 0;
@@ -605,6 +606,17 @@ class Imgui {
 			return true;
 		}
 		return false;
+	}
+
+	/** Adds callback for delayed code execution. Can be executed with `executeCallbacks()` at the end of the frame, for example. **/
+	public function addCallback(fn:()->Void):Void {
+		callbacks.push(fn);
+	}
+
+	/** Execute all added callbacks and clear array. **/
+	public function executeCallbacks():Void {
+		for (fn in callbacks) fn();
+		callbacks.resize(0);
 	}
 
 }
