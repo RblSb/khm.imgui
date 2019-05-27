@@ -98,11 +98,11 @@ public static function button(ui:Imgui, x:Int, y:Int, text = ""):Bool {
 	final id = ui.getId();
 	final w = buttonW; // static vars
 	final h = buttonH;
-	// WidgetRect is abstract on Array<Int>
+	// WidgetRect is inlined class
 	final rect = new WidgetRect(id, x, y, w, h);
 	// add to current frame (for input event prevention and overlapping)
 	ui.addWidget(rect);
-	// set widget state idle/hovered/active based on overlapping / widget groups / pointer ids
+	// set widget state idle/hovered/active based on overlapping, widget groups and pointer ids
 	ui.checkWidgetState(rect);
 
 	// every widget can have multiply states at once, like Active + Hover + Focus.
