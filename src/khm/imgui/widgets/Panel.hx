@@ -4,6 +4,7 @@ import kha.graphics2.Graphics;
 import khm.imgui.Widgets.bgColor;
 import khm.imgui.Widgets.hoverColor;
 import khm.imgui.Widgets.textColor;
+import khm.Screen.Pointer;
 
 @:access(khm.imgui.Widgets)
 class Panel {
@@ -22,7 +23,7 @@ class Panel {
 		final rect = new WidgetRect(id, x, y, w, h);
 		ui.addWidget(rect);
 
-		if (ui.isFocused(id)) Widgets.drawFocusBorder(g, rect);
+		if (ui.isFocused(id)) Widgets.drawFocusBorder(g, x, y, w, h);
 		ui.checkWidgetState(rect);
 		var state:WidgetState = ui.getWidgetState(id);
 		if (ui.isPressed(id)) state = Active;

@@ -5,6 +5,8 @@ import kha.System;
 import kha.input.Mouse;
 import kha.input.Keyboard;
 import kha.input.KeyCode;
+import kha.math.FastMatrix3;
+import khm.Screen.Pointer;
 
 @:structInit
 class ImguiSets {
@@ -18,14 +20,7 @@ class ImguiSets {
 class Imgui {
 
 	static inline var PNUM = 10;
-	final pointers:Array<Pointer> = [
-		for (i in 0...PNUM) {
-			id: i, startX: 0, startY: 0,
-			x: 0, y: 0, moveX: 0, moveY: 0,
-			type: 0, isDown: false,
-			isTouch: false, isActive: false
-		}
-	];
+	final pointers:Array<Pointer> = [];
 	public final hoverIds:Array<Int> = [for (i in 0...PNUM) 0];
 	public final lastHoverIds:Array<Int> = [for (i in 0...PNUM) 0];
 	public final activeIds:Array<Int> = [for (i in 0...PNUM) 0];
@@ -50,8 +45,8 @@ class Imgui {
 	final keys:Map<KeyCode, Bool> = [];
 	var lastFrame:Array<WidgetRect> = [];
 	var frame:Array<WidgetRect> = [];
-	var scissorRect:WidgetRect;
-	var oldG:Graphics;
+	var scissorRect:Null<WidgetRect>;
+	var oldG:Null<Graphics>;
 	var focusItemId = 0;
 	var id = 0;
 	var blockKeyPress = false;
@@ -71,6 +66,7 @@ class Imgui {
 			if (Keyboard.get() != null) {
 				Keyboard.get().notify(onKeyDown, onKeyUp, onKeyPress);
 			}
+			for (i in 0...PNUM) pointers.push(new Pointer(i));
 		}
 		System.notifyOnCutCopyPaste(onCut, onCopy, onPaste);
 	}
@@ -95,6 +91,7 @@ class Imgui {
 	}
 
 	public function onPointerDown(p:Pointer):Bool {
+		p.toGlobalCords(p.scale);
 		if (pointers[p.id] != p) pointers[p.id] = p;
 		keyboardFocus = false;
 		pointersDown[p.id] = true;
@@ -106,22 +103,30 @@ class Imgui {
 				}
 			} else setActive(p.id, hoverIds[p.id]);
 		}
-		return isPointerBlocked(p.id, p.x, p.y);
+		final isBlocked = isPointerBlocked(p.id, p.x, p.y);
+		p.toLocalCords(p.scale);
+		return isBlocked;
 	}
 
 	public function onPointerMove(p:Pointer):Bool {
+		p.toGlobalCords(p.scale);
 		if (pointers[p.id] != p) pointers[p.id] = p;
-		return isPointerBlocked(p.id, p.x, p.y);
+		final isBlocked = isPointerBlocked(p.id, p.x, p.y);
+		p.toLocalCords(p.scale);
+		return isBlocked;
 	}
 
 	public function onPointerUp(p:Pointer):Bool {
+		p.toGlobalCords(p.scale);
 		if (pointers[p.id] != p) pointers[p.id] = p;
 		pointersUp[p.id] = true;
 		if (redrawOnEvents) {
 			pointersDown[p.id] = false;
 			pointersUp[p.id] = false;
 		}
-		return isPointerBlocked(p.id, p.x, p.y);
+		final isBlocked = isPointerBlocked(p.id, p.x, p.y);
+		p.toLocalCords(p.scale);
+		return isBlocked;
 	}
 
 	function isPointerBlocked(id:Int, x:Int, y:Int):Bool {
@@ -187,8 +192,12 @@ class Imgui {
 	}
 
 	public function onMouseWheel(delta:Int):Bool {
+		final p = pointers[0];
 		mouseWheel = delta;
-		return isPointerBlocked(0, pointers[0].x, pointers[0].y);
+		p.toGlobalCords(p.scale);
+		final isBlocked = isPointerBlocked(0, p.x, p.y);
+		p.toLocalCords(p.scale);
+		return isBlocked;
 	}
 
 	public function onTouchDown(id:Int, x:Int, y:Int):Bool {
@@ -348,10 +357,20 @@ class Imgui {
 		lastFrame = frame;
 		frame = [];
 		if (!debug) return;
+		final temp = FastMatrix3.identity();
+		temp.setFrom(g.transformation);
+		g.transformation.setFrom(FastMatrix3.identity());
 		for (rect in lastFrame) {
 			g.color = 0x88FF0000;
 			g.drawRect(rect.x + 0.5, rect.y + 0.5, rect.w - 1, rect.h - 1);
 		}
+		for (p in pointers) {
+			if (!p.isActive) continue;
+			p.toGlobalCords(p.scale);
+			g.fillRect(p.x, p.y, 3, 3);
+			p.toLocalCords(p.scale);
+		}
+		g.transformation.setFrom(temp);
 	}
 
 	/**
@@ -383,6 +402,12 @@ class Imgui {
 			if (rect.w < 0) rect.w = 0;
 			if (rect.h < 0) rect.h = 0;
 		}
+		final scaleX = g.transformation._00;
+		final scaleY = g.transformation._11;
+		rect.x = Std.int(rect.x * scaleX);
+		rect.y = Std.int(rect.y * scaleY);
+		rect.w = Std.int(rect.w * scaleX);
+		rect.h = Std.int(rect.h * scaleY);
 		frame.push(rect);
 	}
 
@@ -412,8 +437,10 @@ class Imgui {
 	public function isInside(id:Int, x:Int, y:Int, w:Int, h:Int):Null<Pointer> {
 		for (p in pointers) {
 			if (!pointersDown[p.id] && !p.isActive) continue;
+			p.toGlobalCords(p.scale);
 			if (p.x < x || p.y < y ||
 				p.x >= x + w || p.y >= y + h) {
+				p.toLocalCords(p.scale);
 				continue;
 			}
 			// check overlapping
@@ -422,9 +449,11 @@ class Imgui {
 				if (p.x >= rect.x && p.y >= rect.y &&
 					p.x < rect.x + rect.w &&
 					p.y < rect.y + rect.h) {
+					p.toLocalCords(p.scale);
 					return null;
 				}
 			}
+			p.toLocalCords(p.scale);
 			return p;
 		}
 		return null;

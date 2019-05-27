@@ -6,6 +6,7 @@ import kha.Image;
 import khm.imgui.widgets.Input;
 import khm.imgui.widgets.Panel;
 import khm.imgui.widgets.Select in Sel;
+import khm.Screen.Pointer;
 
 typedef InputState = khm.imgui.widgets.Input.InputState;
 typedef PanelState = khm.imgui.widgets.Panel.PanelState;
@@ -44,7 +45,7 @@ class Widgets {
 		ui.addWidget(rect);
 		ui.checkWidgetState(rect);
 
-		if (ui.isFocused(id)) drawFocusBorder(g, rect);
+		if (ui.isFocused(id)) drawFocusBorder(g, x, y, w, h);
 
 		final state = ui.getWidgetState(id);
 		g.color = switch (state) {
@@ -72,7 +73,7 @@ class Widgets {
 		ui.addWidget(rect);
 		ui.checkWidgetState(rect);
 
-		if (ui.isFocused(id)) drawFocusBorder(g, rect);
+		if (ui.isFocused(id)) drawFocusBorder(g, x, y, w, h);
 
 		final state = ui.getWidgetState(id);
 		g.color = switch (state) {
@@ -111,7 +112,7 @@ class Widgets {
 		final rect = new WidgetRect(id, x, y, w * 2 + textW, h);
 		ui.addWidget(rect);
 
-		if (ui.isFocused(id)) drawFocusBorder(g, rect);
+		if (ui.isFocused(id)) drawFocusBorder(g, x, y, w, h);
 
 		ui.checkWidgetState(rect);
 		final state:WidgetState = ui.getWidgetState(id);
@@ -153,10 +154,10 @@ class Widgets {
 		final rect = new WidgetRect(id, x, y, w, h);
 		ui.addWidget(rect);
 
-		if (ui.isFocused(id)) drawFocusBorder(g, rect);
+		if (ui.isFocused(id)) drawFocusBorder(g, x, y, w, h);
 
 		ui.checkWidgetState(rect);
-		var state:WidgetState = ui.getWidgetState(id);
+		var state = ui.getWidgetState(id);
 		if (ui.isPressed(id)) state = Active;
 		switch (state) {
 			case Idle:
@@ -209,10 +210,10 @@ class Widgets {
 		Panel.endPanel(ui, panel);
 	}
 
-	static inline function drawFocusBorder(g:Graphics, rect:WidgetRect):Void {
+	static inline function drawFocusBorder(g:Graphics, x:Int, y:Int, w:Int, h:Int):Void {
 		g.color = focusColor;
 		final s = 2;
-		g.drawRect(rect.x - s / 2, rect.y - s / 2, rect.w + s, rect.h + s, s);
+		g.drawRect(x - s / 2, y - s / 2, w + s, h + s, s);
 	}
 
 	static final scissors:Array<WidgetRect> = [];

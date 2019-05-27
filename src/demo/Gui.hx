@@ -3,11 +3,12 @@ package demo;
 import kha.graphics2.Graphics;
 import kha.Canvas;
 import kha.Assets;
-import kha.System;
+import kha.Window;
 import kha.input.Mouse;
 import kha.input.KeyCode;
 import khm.imgui.Imgui;
 import khm.Screen;
+import khm.Screen.Pointer;
 import khm.imgui.Widgets.InputState;
 import khm.imgui.Widgets.PanelState;
 import khm.imgui.Widgets.SelectState;
@@ -16,19 +17,27 @@ using khm.imgui.Widgets;
 class Gui extends Screen {
 
 	var ui:Imgui;
+	var touchDebugPointer = new Pointer(0);
 
 	public function init():Void {
 		ui = new Imgui({autoNotifyInput: false});
 	}
 
-	final pOffX = 500;
 	function secondPointer(p:Pointer):Pointer {
-		final p2 = Reflect.copy(p);
+		final offX = 500;
+		final p2 = touchDebugPointer;
 		p2.id = p.id + 1;
-		p2.startX += pOffX;
-		p2.x += pOffX;
-		p2.isActive = p2.isDown;
+		p2.scale = p.scale;
+		p2.startX = p.startX + offX;
+		p2.startY = p.startY;
+		p2.x = p.x + offX;
+		p2.y = p.y;
+		p2.moveX = p.moveX;
+		p2.moveY = p.moveY;
+		p2.type = p.type;
+		p2.isDown = p.isDown;
 		p2.isTouch = true;
+		p2.isActive = p2.isDown;
 		return p2;
 	}
 
@@ -97,8 +106,10 @@ class Gui extends Screen {
 		g.fontSize = 24;
 		renderGUI(g);
 
+		// simulate second touch pointer
+		final p = secondPointer(pointers[0]);
 		g.color = 0xFFFF0000;
-		g.fillRect(pointers[0].x + pOffX - 1, pointers[0].y - 1, 3, 3);
+		g.fillRect(p.x - 1, p.y - 1, 3, 3);
 		g.color = 0xFF707070;
 		final charH = g.font.height(g.fontSize);
 		g.drawString("Hover: " + ui.hoverIds, 5, 0);
@@ -118,8 +129,8 @@ class Gui extends Screen {
 
 	function renderGUI(g:Graphics):Void {
 		ui.begin(g);
-		if (ui.button(100, 40, "Hide")) System.requestFullscreen();
-		if (ui.button(200, 40, "Show")) System.exitFullscreen();
+		if (ui.button(100, 40, "Hide")) Window.get(0).mode = Fullscreen;
+		if (ui.button(200, 40, "Show")) Window.get(0).mode = Windowed;
 		if (ui.button(100, 100, "Test")) clickNum--;
 		ui.setButtonSize(80, 20);
 		if (ui.button(200, 100, '$clickNum')) clickNum++;

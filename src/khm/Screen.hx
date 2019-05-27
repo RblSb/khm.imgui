@@ -12,29 +12,48 @@ import kha.Scheduler;
 import kha.System;
 import kha.Font;
 
-typedef Pointer = {
-	// pointer id (0 - 9)
-	id:Int,
+class Pointer {
+
+	public var id:Int;
+	public var scale = 1.0;
 	// initial cords of pressing
-	startX:Int,
-	startY:Int,
-	x:Int,
-	y:Int,
+	public var startX = 0;
+	public var startY = 0;
+	public var x = 0;
+	public var y = 0;
 	// last pointer speed
-	moveX:Int,
-	moveY:Int,
+	public var moveX = 0;
+	public var moveY = 0;
 	// button type (for mouse)
-	type:Int,
-	isDown:Bool,
+	public var type = 0;
+	public var isDown = false;
 	// pointer is touch surface
-	isTouch:Bool,
+	public var isTouch = false;
 	// pointer already used
-	isActive:Bool
+	public var isActive = false;
+
+	public function new(id:Int):Void {
+		this.id = id;
+	}
+
+	public function toGlobalCords(scale:Float):Void {
+		startX = Std.int(startX * scale);
+		startY = Std.int(startY * scale);
+		x = Std.int(x * scale);
+		y = Std.int(y * scale);
+	}
+
+	public function toLocalCords(scale:Float):Void {
+		startX = Std.int(startX / scale);
+		startY = Std.int(startY / scale);
+		x = Std.int(x / scale);
+		y = Std.int(y / scale);
+	}
+
 }
 
 private typedef ScreenSets = {
 	?isTouch:Bool,
-	?samplesPerPixel:Int,
 	?defaultScale:Float
 }
 
@@ -45,7 +64,6 @@ class Screen {
 	public static var w(default, null):Int; // for resize event
 	public static var h(default, null):Int;
 	public static var isTouch(default, null) = false;
-	public static var samplesPerPixel(default, null) = 1;
 	public static var defaultScale(default, null) = 1.0;
 	public static var frame:Canvas;
 	static final fps = new FPS();
@@ -55,7 +73,7 @@ class Screen {
 	public var scale(default, null) = 1.0;
 	public final keys:Map<KeyCode, Bool> = new Map();
 	public final pointers:Map<Int, Pointer> = [
-		for (i in 0...10) i => {id: i, startX: 0, startY: 0, x: 0, y: 0, moveX: 0, moveY: 0, type: 0, isDown: false, isTouch: false, isActive: false}
+		for (i in 0...10) i => new Pointer(i)
 	];
 
 	public function new() {}
@@ -69,17 +87,16 @@ class Screen {
 		#end
 		if (sets != null) {
 			if (sets.isTouch != null) isTouch = sets.isTouch;
-			if (sets.samplesPerPixel != null) samplesPerPixel = sets.samplesPerPixel;
 			if (sets.defaultScale != null) defaultScale = sets.defaultScale;
 		}
 		setDefaultScale(defaultScale);
+		w = Std.int(System.windowWidth() / defaultScale);
+		h = Std.int(System.windowHeight() / defaultScale);
 		isInited = true;
 	}
 
 	public static inline function setDefaultScale(scale:Float):Void {
 		defaultScale = scale;
-		w = Std.int(System.windowWidth() / scale);
-		h = Std.int(System.windowHeight() / scale);
 	}
 
 	/** Displays this screen. Automatically hides the previous. **/
@@ -100,7 +117,10 @@ class Screen {
 			Mouse.get().notify(_onMouseDown, _onMouseUp, _onMouseMove, onMouseWheel, onMouseLeave);
 		}
 		for (i in keys.keys()) keys[i] = false;
-		for (p in pointers) p.isDown = false;
+		for (p in pointers) {
+			p.isDown = false;
+			p.scale = scale;
+		}
 	}
 
 	/** For hiding the current screen manually. **/
@@ -135,7 +155,7 @@ class Screen {
 
 		frame = framebuffer;
 		final g = frame.g2;
-		g.transformation = FastMatrix3.scale(scale, scale);
+		g.transformation.setFrom(FastMatrix3.scale(scale, scale));
 		onRender(frame);
 
 		#if debug
@@ -151,7 +171,7 @@ class Screen {
 	}
 
 	function drawFPS(g:Graphics, font:Font):Void {
-		g.transformation = FastMatrix3.identity();
+		g.transformation.setFrom(FastMatrix3.identity());
 		g.color = 0xFFFFFFFF;
 		g.font = font;
 		g.fontSize = 24;
@@ -176,6 +196,7 @@ class Screen {
 	inline function _onMouseDown(button:Int, x:Int, y:Int):Void {
 		x = Std.int(x / scale);
 		y = Std.int(y / scale);
+		pointers[0].scale = scale;
 		pointers[0].startX = x;
 		pointers[0].startY = y;
 		pointers[0].x = x;
@@ -190,6 +211,7 @@ class Screen {
 	inline function _onMouseMove(x:Int, y:Int, mx:Int, my:Int):Void {
 		x = Std.int(x / scale);
 		y = Std.int(y / scale);
+		pointers[0].scale = scale;
 		pointers[0].x = x;
 		pointers[0].y = y;
 		pointers[0].moveX = mx;
@@ -202,6 +224,7 @@ class Screen {
 		if (!pointers[0].isActive) return;
 		x = Std.int(x / scale);
 		y = Std.int(y / scale);
+		pointers[0].scale = scale;
 		pointers[0].x = x;
 		pointers[0].y = y;
 		pointers[0].type = button;
@@ -213,6 +236,7 @@ class Screen {
 		if (id > 9) return;
 		x = Std.int(x / scale);
 		y = Std.int(y / scale);
+		pointers[id].scale = scale;
 		pointers[id].startX = x;
 		pointers[id].startY = y;
 		pointers[id].x = x;
@@ -227,6 +251,7 @@ class Screen {
 		if (id > 9) return;
 		x = Std.int(x / scale);
 		y = Std.int(y / scale);
+		pointers[id].scale = scale;
 		pointers[id].moveX = x - pointers[id].x;
 		pointers[id].moveY = y - pointers[id].y;
 		pointers[id].x = x;
@@ -249,14 +274,35 @@ class Screen {
 	}
 
 	/**
-		Sets the scale of the screen. Automatically sets this value through `g2.transformation` before `onRender`.
+		Sets the scale of the screen and change screen size. Automatically sets this value through `g2.transformation` before `onRender`. Calls `onRescale` and then `onResize`.
 	**/
 	public function setScale(scale:Float):Void {
+		setScaleSilent(scale);
+		onRescale(scale);
+		onResize();
+	}
+
+	/** Same as `setScale` but without triggering events. **/
+	public function setScaleSilent(scale:Float):Void {
+		for (p in pointers) {
+			if (p.isActive) {
+				p.toGlobalCords(this.scale);
+				p.toLocalCords(scale);
+				p.scale = scale;
+			}
+		}
 		this.scale = scale;
 		w = Std.int(System.windowWidth() / scale);
 		h = Std.int(System.windowHeight() / scale);
-		onRescale(scale);
-		onResize();
+	}
+
+	/**
+		Changes g2.transformation and screen size. Doesn't trigger events.
+	**/
+	public function setGraphicScale(g:Graphics, scale:Float):Void {
+		g.transformation.setFrom(FastMatrix3.scale(scale, scale));
+		w = Std.int(System.windowWidth() / scale);
+		h = Std.int(System.windowHeight() / scale);
 	}
 
 	// functions for override

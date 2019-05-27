@@ -6,6 +6,7 @@ import khm.imgui.Widgets.bgColor;
 import khm.imgui.Widgets.hoverColor;
 import khm.imgui.Widgets.activeColor;
 import khm.imgui.Widgets.textColor;
+import khm.Screen.Pointer;
 
 @:access(khm.imgui.Widgets)
 class Select {
@@ -20,7 +21,7 @@ class Select {
 		final rect = new WidgetRect(id, x, y, w, h);
 		ui.addWidget(rect);
 
-		if (ui.isFocused(id)) Widgets.drawFocusBorder(g, rect);
+		if (ui.isFocused(id)) Widgets.drawFocusBorder(g, x, y, w, h);
 
 		ui.checkWidgetState(rect);
 		var state:WidgetState = ui.getWidgetState(id);

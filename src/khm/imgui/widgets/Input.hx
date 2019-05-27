@@ -7,6 +7,7 @@ import khm.imgui.Widgets.hoverColor;
 import khm.imgui.Widgets.activeColor;
 import khm.imgui.Widgets.focusColor;
 import khm.imgui.Widgets.textColor;
+import khm.Screen.Pointer;
 
 @:access(khm.imgui.Widgets)
 class Input {
