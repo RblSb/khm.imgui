@@ -42,6 +42,7 @@ class Imgui {
 	final pointersDown:Array<Bool> = [for (i in 0...PNUM) false];
 	final pointersUp:Array<Bool> = [for (i in 0...PNUM) false];
 	final blockedKeys:Map<KeyCode, Bool> = [];
+	var hasBlockedKeys = false;
 	final keys:Map<KeyCode, Bool> = [];
 	final lastFrame = new Frame();
 	final frame = new Frame();
@@ -68,8 +69,8 @@ class Imgui {
 			if (Keyboard.get() != null) {
 				Keyboard.get().notify(onKeyDown, onKeyUp, onKeyPress);
 			}
-			for (i in 0...PNUM) pointers.push(new Pointer(i));
 		}
+		for (i in 0...PNUM) pointers.push(new Pointer(i));
 		System.notifyOnCutCopyPaste(onCut, onCopy, onPaste);
 	}
 
@@ -334,7 +335,10 @@ class Imgui {
 			hoverIds[i] = 0;
 			widgetGroups[i] = 0;
 		}
-		for (i in blockedKeys.keys()) blockedKeys[i] = false;
+		if (hasBlockedKeys) {
+			for (i in blockedKeys.keys()) blockedKeys[i] = false;
+			hasBlockedKeys = false;
+		}
 		if (blockKeyPress) keyChar = "";
 		blockKeyPress = false;
 		id = 0;
@@ -565,12 +569,14 @@ class Imgui {
 	/** Checks if key pressed. Also add key to stack for prevention outside of gui. **/
 	public inline function isKey(key:KeyCode):Bool {
 		blockedKeys[key] = true;
+		hasBlockedKeys = true;
 		return keys[key];
 	}
 
 	/** Same as `isKey`, but also make key up. **/
 	public function isKeyOnce(key:KeyCode):Bool {
 		blockedKeys[key] = true;
+		hasBlockedKeys = true;
 		if (keys[key]) {
 			keys[key] = false;
 			return true;
@@ -631,8 +637,10 @@ class Imgui {
 
 	/** Execute all added callbacks and clear array. **/
 	public function executeCallbacks():Void {
-		for (fn in callbacks) fn();
+		if (callbacks.length == 0) return;
+		final fns = callbacks.copy();
 		callbacks.resize(0);
+		for (fn in fns) fn();
 	}
 
 }
