@@ -52,9 +52,11 @@ class Pointer {
 
 }
 
-private typedef ScreenSets = {
-	?isTouch:Bool,
-	?defaultScale:Float
+@:structInit
+class ScreenSets {
+	public var isTouch:Null<Bool> = null;
+	public var showFps = false;
+	public var defaultScale = 1.0;
 }
 
 /** Сlass for unifying mouse/touch events and setup events automatically **/
@@ -63,10 +65,11 @@ class Screen {
 	public static var screen:Screen; // current screen
 	public static var w(default, null):Int; // for resize event
 	public static var h(default, null):Int;
-	public static var isTouch(default, null) = false;
-	public static var defaultScale(default, null) = 1.0;
+	public static var isTouch(default, null):Bool;
+	public static var showFps(default, null):Bool;
+	public static var defaultScale(default, null):Float;
 	public static var frame:Canvas;
-	static final fps = new FPS();
+	static final fps = new Fps();
 	static var taskId:Int;
 	static var isInited = false;
 
@@ -85,10 +88,10 @@ class Screen {
 		#elseif (kha_android || kha_ios)
 		isTouch = true;
 		#end
-		if (sets != null) {
-			if (sets.isTouch != null) isTouch = sets.isTouch;
-			if (sets.defaultScale != null) defaultScale = sets.defaultScale;
-		}
+		if (sets == null) sets = {};
+		if (sets.isTouch != null) isTouch = sets.isTouch;
+		showFps = sets.showFps;
+		defaultScale = sets.defaultScale;
 		setDefaultScale(defaultScale);
 		w = Std.int(System.windowWidth() / defaultScale);
 		h = Std.int(System.windowHeight() / defaultScale);
@@ -151,36 +154,19 @@ class Screen {
 	}
 
 	inline function _onRender(framebuffers:Array<Framebuffer>):Void {
-		final framebuffer = framebuffers[0];
-
-		frame = framebuffer;
+		frame = framebuffers[0];
 		final g = frame.g2;
 		g.transformation.setFrom(FastMatrix3.scale(scale, scale));
 		onRender(frame);
 
-		#if debug
-		final font = frame.g2.font;
-		if (font != null) {
-			final g = framebuffer.g2;
-			g.begin(false);
-			drawFPS(g, font);
-			g.end();
-		}
-		#end
 		fps.addFrame();
-	}
-
-	function drawFPS(g:Graphics, font:Font):Void {
-		g.transformation.setFrom(FastMatrix3.identity());
-		g.color = 0xFFFFFFFF;
-		g.font = font;
-		g.fontSize = 24;
-		final w = System.windowWidth();
-		final h = System.windowHeight();
-		final txt = '${fps.fps} | ${w}x${h} ${scale}x';
-		final x = w - g.font.width(g.fontSize, txt);
-		final y = h - g.font.height(g.fontSize);
-		g.drawString(txt, x, y);
+		if (showFps) fps.render(this, g);
+		#if js
+		if (showFps) return;
+		final g = frame.g2;
+		g.begin(false);
+		g.end();
+		#end
 	}
 
 	inline function _onKeyDown(key:KeyCode):Void {
@@ -324,7 +310,7 @@ class Screen {
 
 }
 
-private class FPS {
+private class Fps {
 
 	public var fps(default, null) = 0;
 	var frames = 0;
@@ -344,6 +330,21 @@ private class FPS {
 			time = 0;
 		}
 		return fps;
+	}
+
+	public function render(screen:Screen, g:Graphics):Void {
+		if (g.font == null) return;
+		g.begin(false);
+		g.transformation.setFrom(FastMatrix3.identity());
+		g.color = 0xFFFFFFFF;
+		g.fontSize = 24;
+		final w = System.windowWidth();
+		final h = System.windowHeight();
+		final txt = '$fps | ${w}x${h} ${screen.scale}x';
+		final x = w - g.font.width(g.fontSize, txt);
+		final y = h - g.font.height(g.fontSize);
+		g.drawString(txt, x, y);
+		g.end();
 	}
 
 	public inline function addFrame():Void frames++;

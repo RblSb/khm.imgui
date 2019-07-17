@@ -20,6 +20,7 @@ class Gui extends Screen {
 	var touchDebugPointer = new Pointer(0);
 
 	public function init():Void {
+		Screen.showFps = true;
 		ui = new Imgui({autoNotifyInput: false});
 	}
 
